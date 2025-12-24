@@ -1,0 +1,2709 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joc verbs irregulars (anglès)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  .hidden{display:none !important;}
+
+    .card { box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+    .btn-disabled { opacity:.55; pointer-events:none; }
+    .shake { animation: shake .3s; }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+      75% { transform: translateX(-6px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* Options: keep color even on hover */
+    .optBtn { transition: background-color .15s, border-color .15s, transform .08s; }
+    .optBtn:hover { background-color: rgb(241 245 249); } /* slate-100 */
+    .optLocked:hover { background-color: inherit !important; }
+    .optCorrect { background-color: rgb(134 239 172) !important; border-color: rgb(22 163 74) !important; }
+    .optWrong { background-color: rgb(252 165 165) !important; border-color: rgb(220 38 38) !important; }
+    .optReveal { background-color: rgb(134 239 172) !important; border-color: rgb(22 163 74) !important; }
+  
+      table{min-width:720px;}
+      @media (max-width:480px){
+        body{padding:12px !important;}
+        h1{font-size:28px !important;}
+        th,td{font-size:14px;}
+      }
+    
+    /* Active level button: bigger + 3D */
+    .levelBtn { position: relative; }
+    .levelBtn.level-active{
+      transform: translateY(-1px) scale(1.12);
+      box-shadow: 0 10px 16px rgba(0,0,0,.18);
+      filter: brightness(1.03);
+      z-index: 5;
+    }
+    .levelBtn.level-active::after{
+      content:"";
+      position:absolute; inset:0;
+      border-radius:0.5rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 -2px 0 rgba(0,0,0,.18);
+      pointer-events:none;
+    }
+    @media (prefers-reduced-motion: reduce){
+      .levelBtn.level-active{ transform:none; }
+    }
+
+  
+    #btnHelp, #btnList{ white-space:nowrap; }
+
+    /* Top action buttons: keep on one line and equal width (auto) */
+#btnHelp, #btnList{
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: unset !important;
+}
+/* Make level title visible but not stronger than the verb */
+#levelTitle{
+  font-weight: 600; /* bold, not black */
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+
+
+  /* Level 3 tense filters */
+  #tenseFilters .tenseChk{ width:14px; height:14px; }
+  #tenseFilters label{ white-space:nowrap; }
+
+
+    /* Level 3 tense filters (right side) */
+    #tenseFilters{ justify-self:end; align-self:start; }
+    #tenseFilters .tenseBox{ width: max-content; }
+
+  :root{--sideBtnW:160px;}
+  #btnHelp,#btnList{width:var(--sideBtnW); white-space:nowrap; text-align:center;}
+
+/* --- Layout polish: keep start message & verb on one line when possible (responsive) --- */
+#questionText{
+  text-align:center;
+  line-height:1.15;
+  max-width:100%;
+  word-break:normal;
+  overflow-wrap:normal;
+}
+@media (min-width: 640px){
+  #questionText{
+    white-space:nowrap; /* one line on tablet/desktop when space allows */
+  }
+}
+@media (max-width: 639px){
+  #questionText{
+    white-space:normal; /* allow wrapping on mobile */
+  }
+}
+
+
+    /* --- fixes: visibility + header layout --- */
+    #questionHint{margin:4px 0 3px 0;}
+
+    .hidden{display:none!important;}
+    
+    .quizHeaderGrid.noLevel{grid-template-columns:1fr; justify-items:center;}
+.quizHeaderGrid{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:start;
+      gap:12px;
+    }
+    /* Always keep the center text centered within its column */
+    #questionText{ text-align:center; justify-self:center; }
+    /* When no level selected: only show the center area, fully centered */
+    .no-level #quizHeaderGrid{
+      grid-template-columns:1fr;
+      justify-items:center;
+    }
+    .no-level #questionText{width:100%; text-align:center;}
+    .no-level #levelHeaderLeft,
+    .no-level #tenseFilters{ display:none!important; }
+    /* Tense filters: vertical box top-right */
+    .tenseFilters{ justify-self:end; align-self:start; }
+    .tenseBox{ display:flex; flex-direction:column; gap:6px; }
+    @media (max-width: 520px){
+      /* on very small screens, let the verb wrap and avoid pushing filters down */
+      #questionText{ white-space:normal; overflow-wrap:anywhere; }
+      .quizHeaderGrid{ grid-template-columns:auto 1fr auto; }
+    }
+
+  
+/* N3: tense label smaller */
+.tenseSmall{ font-size:0.75em; font-weight:600; opacity:0.85; }
+/* Small square icon buttons */
+.iconBtn{
+  width:40px; height:40px;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.6);
+  background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800;
+}
+.iconBtn:disabled{ opacity:.45; cursor:not-allowed; }
+
+
+  .starBtn{
+    border:0;
+    background:transparent;
+    font-size:20px;
+    line-height:1;
+    padding:2px 4px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .starBtn:hover{ background: rgba(148,163,184,.25); }
+  .starBtn[aria-pressed="false"]{ opacity:.55; }
+  .rightPanel{ display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .studyControls{
+    background: rgba(255,255,255,.6);
+    border:1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px 10px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:flex-start;
+  }
+  .miniResetStars{
+    background:#ef4444;
+    color:#fff;
+    border:0;
+    border-radius:999px;
+    padding:4px 10px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .miniResetStars:disabled{ opacity:.45; cursor:not-allowed; }
+
+  .starToggle{ border:0; background:transparent; font-size:18px; line-height:1; padding:2px 4px; border-radius:8px; cursor:pointer; }
+  .starToggle:hover{ background: rgba(148,163,184,.25); }
+
+    /* Hide star button when no level selected */
+    .no-level #btnStar{display:none!important;}
+
+/* FIX20: compact level 3 spacing */
+#level3Letters{ margin-top: .25rem !important; }
+#level3Letters .bg-white{ padding: .6rem !important; }
+#letterBank{ margin-top: .4rem !important; }
+
+
+/* FIX23: Level 3 - hide top speak button + compact vertical spacing so progress bar stays visible */
+body.lvl3 #btnSpeak{ display:none !important; }
+body.lvl3 #quizArea{ padding: 0.9rem !important; }
+body.lvl3 #questionHint{ margin-top: .25rem !important; margin-bottom: .25rem !important; }
+body.lvl3 #level3Letters{ margin-top: .25rem !important; }
+body.lvl3 #level3Letters .bg-white{ padding: .55rem !important; }
+body.lvl3 #level3Letters .mt-2{ margin-top: .4rem !important; }
+body.lvl3 #letterBank{ gap: .35rem !important; }
+body.lvl3 #quizFooter{ margin-top: .5rem !important; }
+body.lvl3 #progressSection{ margin-top: .6rem !important; }
+
+
+/* FIX24: prevent stray (unwired) audio buttons inside question text */
+#questionText button{ display:none !important; }
+
+/* FIX26: Hide top speak button on levels where the question is NOT English (N2, N3, N6) */
+body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !important; }
+
+
+
+
+.optRow{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  margin-bottom:.75rem;
+}
+.optRow .mcqBtn{
+  flex:1 1 auto;
+}
+.optRow .optAudio{
+  width:44px;
+  min-width:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:.75rem;
+  background:#e2e8f0;
+  opacity:.45;
+}
+.optRow .optAudio:disabled{
+  cursor:not-allowed;
+}
+.optRow .optAudio.optAudioOn{
+  opacity:1;
+}
+
+
+.optRow{
+  display:flex;
+  align-items:stretch;
+  gap:.6rem;
+  margin-bottom:.75rem;
+}
+.optRow .mcqBtn{ flex:1 1 auto; }
+.optRow .optAudio{
+  width:44px;
+  min-width:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:.75rem;
+  border:1px solid rgba(15,23,42,.18);
+  background:rgba(226,232,240,.9);
+  opacity:.55;
+}
+.optRow .optAudio.optAudioOn{ opacity:1; }
+
+
+/* FIX34: Adjacent audio icon rows (only used in N2/N4/N5) */
+.optRow{
+  display:flex;
+  align-items:stretch;
+  gap:.6rem;
+  margin-bottom:.75rem;
+}
+.optRow .optBtn{ flex:1 1 auto; }
+.optRow .optAudio{
+  width:44px;
+  min-width:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:.75rem;
+  border:1px solid rgba(15,23,42,.18);
+  background:rgba(226,232,240,.9);
+  opacity:.55;
+}
+.optRow .optAudio.optAudioOn{ opacity:1; }
+
+
+/* FIX36: Smaller, consistent audio icons for N2/N4/N5 options */
+.optRow .optAudio{
+  width:32px;
+  min-width:32px;
+  height:32px;
+  border-radius:0.5rem;
+  font-size:0.9rem;
+  padding:0;
+}
+.optRow .optAudio svg,
+.optRow .optAudio span{
+  transform: scale(0.9);
+}
+
+
+/* FIX38: center audio buttons in rows */
+.optRow .optAudio{ align-self:center; }
+
+/* FIX41: place audio mode selector on the left side of header */
+.audioModeSel{
+  margin-right:auto;
+}
+
+
+
+/* FIX48: Level 3 tense filters under level title, not in right panel */
+.lvl3HeaderCol{ flex-direction:column; align-items:flex-start; gap:.25rem; }
+.lvl3HeaderCol #tenseFilters{ margin:0; }
+.lvl3HeaderCol #tenseFilters .tenseBox{ box-shadow:none; }
+
+
+/* FIX51: In level 3, left header stack vertically so tense filters sit BELOW title row */
+.lvl3LeftCol{ display:flex; flex-direction:column; align-items:flex-start; gap:.5rem; }
+#lvlTopRow{ display:flex; align-items:center; gap:.75rem; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-3 sm:p-4">
+<div id="app" class="max-w-3xl mx-auto bg-white rounded-2xl card p-4 sm:p-6">
+    <header class="mb-3 relative">
+      <div class="absolute left-0 top-0">
+        <select id="audioModeSel" class="audioModeSel border border-slate-200 rounded-xl px-3 py-2 bg-white text-sm">
+  <option value="auto">🔊 Auto</option>
+  <option value="manual">🔊 Manual</option>
+</select>
+      </div>
+      <div class="absolute right-0 top-0">
+        <select id="langSel" class="border rounded-lg px-3 py-2 bg-white text-sm">
+      <option value="ca">Català</option>
+      <option value="es">Castellano</option>
+      <option value="ka">ქართული</option>
+    </select>
+      </div>
+      <h1 id="appTitle" class="text-xl sm:text-2xl font-bold text-center pr-28">Verbs Irregulars anglesos</h1>
+      <p id="appSubtitle" class="text-center text-slate-500 mt-1 text-sm">
+        6 nivells. No pugis de nivell fins haver encertat tots els verbs almenys 1 cop.
+      </p>
+    </header>
+
+    <div class="mb-3">
+      <div class="flex items-start justify-between gap-2">
+        <div id="levelBar" class="flex flex-wrap gap-2 justify-center w-full">
+          <button data-level="1" class="levelBtn shrink-0 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition text-sm">N1</button>
+          <button data-level="2" class="levelBtn shrink-0 bg-sky-500 text-white px-3 py-1 rounded hover:bg-sky-600 transition text-sm">N2</button>
+          <button data-level="3" class="levelBtn shrink-0 bg-teal-500 text-white px-3 py-1 rounded hover:bg-teal-600 transition text-sm">N3</button>
+          <button data-level="4" class="levelBtn shrink-0 bg-emerald-500 text-white px-3 py-1 rounded hover:bg-emerald-600 transition text-sm">N4</button>
+          <button data-level="5" class="levelBtn shrink-0 bg-amber-500 text-white px-3 py-1 rounded hover:bg-amber-600 transition text-sm">N5</button>
+          <button data-level="6" class="levelBtn shrink-0 bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition text-sm">N6</button>
+        </div>
+        
+
+        <div class="flex flex-col gap-2 items-end">
+          <button id="btnHelp" class="bg-slate-200 text-slate-800 font-bold px-2 py-1 rounded hover:bg-slate-300 transition text-xs min-w-[110px] text-center" style="white-space:nowrap; ">Instruccions</button>
+<button id="btnList" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded hover:bg-emerald-700 transition text-xs min-w-[110px] text-center" style="white-space:nowrap; ">Llista de verbs</button>
+        </div>
+      </div>
+
+      <div id="devHint" class="mt-2 hidden text-xs text-slate-500">
+        Mode prova actiu: nivells desbloquejats (URL amb <code class="bg-slate-100 px-1 rounded">?dev=1</code>).
+      </div>
+    </div>
+
+    <div id="quizArea" class="bg-slate-50 rounded-xl p-4 sm:p-6">
+      <div id="quizHeaderGrid" class="quizHeaderGrid">
+        <div class="flex items-center gap-2" id="levelHeaderLeft">
+          <div class="text-sm text-slate-500" id="levelTitle">Nivell 1</div>
+          <button id="btnReset" class="bg-red-600 text-white font-bold px-3 py-1 rounded-lg shadow-sm hover:bg-red-700 transition text-xs disabled:opacity-40 disabled:cursor-not-allowed">Reinicia</button>
+        </div>
+
+        <div class="flex items-center justify-center gap-2" id="questionCenter">
+          <button id="btnStar" class="starBtn" title="⭐">⭐</button>
+          <div class="text-xl sm:text-2xl font-semibold text-center" id="questionText">Selecciona un nivell per començar</div>
+          <button id="btnSpeak" title="Escoltar pronunciació" class="bg-slate-200 hover:bg-slate-300 rounded px-2 py-1 text-sm">🔊</button>
+        </div>
+        <!-- question hint moved below header for better alignment -->
+        
+        <div id="rightPanel" class="rightPanel">
+        <div id="studyControls" class="hidden studyControls">
+          <label class="flex items-center gap-2 text-xs cursor-pointer select-none">
+            <input type="checkbox" id="chkFavOnly" />
+            <span id="lblFavOnly">Només ⭐</span>
+          </label>
+          <button id="btnResetStars" class="miniResetStars">Reinicia ⭐</button>
+        </div>
+        <div id="tenseFilters" class="hidden tenseFilters">
+          <div class="tenseBox bg-white/60 border border-slate-200 rounded-lg px-2 py-2 flex flex-col gap-1 items-start">
+            <label class="flex items-center gap-1 text-xs cursor-pointer select-none">
+              <input id="tenseInf" type="checkbox" class="tenseChk" data-tense="inf">
+              <span id="tenseInfLbl">Infinitive</span>
+            </label>
+            <label class="flex items-center gap-1 text-xs cursor-pointer select-none">
+              <input id="tensePast" type="checkbox" class="tenseChk" data-tense="past">
+              <span id="tensePastLbl">Simple Past</span>
+            </label>
+            <label class="flex items-center gap-1 text-xs cursor-pointer select-none">
+              <input id="tensePP" type="checkbox" class="tenseChk" data-tense="pp">
+              <span id="tensePPLbl">Past Participle</span>
+            </label>
+          </div>
+        </div></div>
+    
+      </div>
+
+      <div id="questionHint" class="mt-2 mb-1 text-sm text-slate-500 text-left"></div>
+
+      <div id="answers" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2"></div>
+
+
+
+      <!-- Nivell 3: escriu el verb (lletres) -->
+      <div id="level3Letters" class="mt-1 hidden">
+        <div class="bg-white rounded-xl border p-3">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <div class="text-xs text-slate-500">Completa el verb en anglès</div>
+            <div class="flex items-center gap-2">
+              <button id="btnL3Help" class="iconBtn" title="Ajuda">?</button>
+            </div>
+          </div>
+          <div class="flex items-center justify-center gap-3 mt-2">
+  <div id="letterSlots" class="flex flex-wrap gap-2 justify-center"></div>
+  <button id="btnL3Audio" class="iconBtn" title="Audio" disabled>🔊</button>
+</div>
+          <div class="mt-2 text-sm text-slate-500 text-center"><span id="lblLetterExplain">Clica les lletres correctes. Si és correcta, es posarà automàticament al seu lloc. Les incorrectes es marcaran amb una <span class="text-red-600 font-black">✖</span>.</span></div>
+        </div>
+        <div class="mt-2 bg-white rounded-xl border p-3">
+          <div class="text-xs text-slate-500 mb-2">Lletres disponibles</div>
+          <div id="letterBank" class="flex flex-wrap gap-2 justify-center"></div>
+        </div>
+      </div>
+      <div id="level6Area" class="mt-3 hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div class="bg-white rounded-lg p-2 border">
+            <div class="text-xs text-slate-500 mb-1">Infinitive</div>
+            <div class="flex items-center gap-2"><select id="selInf" class="w-full border rounded-lg p-2 bg-white"></select><button id="btnSpeakInf" type="button" class="iconBtn" title="🔊" disabled>🔊</button></div>
+          </div>
+          <div class="bg-white rounded-lg p-2 border">
+            <div class="text-xs text-slate-500 mb-1">Simple past</div>
+            <div class="flex items-center gap-2"><select id="selPast" class="w-full border rounded-lg p-2 bg-white"></select><button id="btnSpeakPast" type="button" class="iconBtn" title="🔊" disabled>🔊</button></div>
+          </div>
+          <div class="bg-white rounded-lg p-2 border">
+            <div class="text-xs text-slate-500 mb-1">Past participle</div>
+            <div class="flex items-center gap-2"><select id="selPP" class="w-full border rounded-lg p-2 bg-white"></select><button id="btnSpeakPP" type="button" class="iconBtn" title="🔊" disabled>🔊</button></div>
+          </div>
+        </div>
+        <button id="btnCheckLevel6" class="mt-2 w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+          Comprovar
+        </button>
+      </div>
+
+      <div class="mt-5">
+        <div id="feedback" class="text-base font-bold text-center sm:text-left"></div>
+      </div>
+
+      <div class="mt-3 flex items-center justify-between gap-3" id="quizFooter">
+        <div class="text-sm text-slate-500">
+          <span id="lblQuestion">Pregunta:</span> <span class="font-semibold text-slate-700" id="qIndex">—</span> / <span class="font-semibold text-slate-700" id="qTotal">—</span>
+        </div>
+        <button id="btnNext" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+          Següent
+        </button>
+      </div>
+    </div>
+
+    
+<div class="mb-4" id="progressSection">
+      <div class="flex justify-between text-sm text-slate-600 mb-1">
+        <span id="lblProgress">Progrés del nivell</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+        <div id="progressBar" class="h-3 bg-blue-500" style="width:0%"></div>
+      </div>
+      <div class="mt-2 text-sm text-slate-600 flex flex-wrap gap-x-4 gap-y-1 justify-between">
+        <div id="scoreLine">Encerts: 0 · Errors: 0</div>
+        <div id="masterLine">Dominats aquest nivell: 0 / 0</div>
+      </div>
+    </div>
+
+    
+<div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl p-5 max-w-lg w-full">
+        <div class="flex justify-between items-center gap-3">
+          <h2 id="modalTitle" class="text-xl font-bold"></h2>
+          <button id="modalClose" class="text-slate-500 hover:text-slate-800 text-2xl leading-none">&times;</button>
+        </div>
+        <div id="modalBody" class="mt-3 text-slate-700 text-sm"></div>
+        <div class="mt-5 flex justify-end gap-2">
+          <button id="modalOk" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">D'acord</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const DEFAULT_VERBS = [{"inf": "arise", "past_raw": "arose", "pp_raw": "arisen", "past": "arose", "pp": "arisen", "es": "surgir", "ca": "sorgir", "ka": "წარმოშობა / აღმოცენება"}, {"inf": "be", "past_raw": "was / were", "pp_raw": "been", "past": "was", "pp": "been", "es": "ser/estar", "ca": "ser/estar", "ka": "ყოფნა"}, {"inf": "beat", "past_raw": "beat", "pp_raw": "beaten", "past": "beat", "pp": "beaten", "es": "golpear / vencer", "ca": "colpejar / vèncer", "ka": "ცემა / დარტყმა"}, {"inf": "become", "past_raw": "became", "pp_raw": "become", "past": "became", "pp": "become", "es": "convertirse en", "ca": "esdevenir / convertir-se en", "ka": "გახდომა"}, {"inf": "begin", "past_raw": "began", "pp_raw": "begun", "past": "began", "pp": "begun", "es": "empezar", "ca": "començar", "ka": "დაწყება"}, {"inf": "bet", "past_raw": "bet/betted", "pp_raw": "bet/betted", "past": "bet", "pp": "bet", "es": "apostar", "ca": "apostar", "ka": "დანაძლევება"}, {"inf": "bite", "past_raw": "bit", "pp_raw": "bitten", "past": "bit", "pp": "bitten", "es": "morder", "ca": "mossegar", "ka": "კბენა"}, {"inf": "bleed", "past_raw": "bled", "pp_raw": "bled", "past": "bled", "pp": "bled", "es": "sangrar", "ca": "sagnar", "ka": "სისხლდენა"}, {"inf": "blow", "past_raw": "blew", "pp_raw": "blown", "past": "blew", "pp": "blown", "es": "soplar", "ca": "bufar", "ka": "დაბერვა"}, {"inf": "break", "past_raw": "broke", "pp_raw": "broken", "past": "broke", "pp": "broken", "es": "romper", "ca": "trencar", "ka": "გატეხვა"}, {"inf": "bring", "past_raw": "brought", "pp_raw": "brought", "past": "brought", "pp": "brought", "es": "traer", "ca": "portar", "ka": "მოტანა"}, {"inf": "build", "past_raw": "built", "pp_raw": "built", "past": "built", "pp": "built", "es": "construir", "ca": "construir", "ka": "აშენება"}, {"inf": "buy", "past_raw": "bought", "pp_raw": "bought", "past": "bought", "pp": "bought", "es": "comprar", "ca": "comprar", "ka": "ყიდვა"}, {"inf": "catch", "past_raw": "caught", "pp_raw": "caught", "past": "caught", "pp": "caught", "es": "atrapar", "ca": "atrapar / agafar", "ka": "დაჭერა"}, {"inf": "choose", "past_raw": "chose", "pp_raw": "chosen", "past": "chose", "pp": "chosen", "es": "elegir", "ca": "triar / escollir", "ka": "არჩევა"}, {"inf": "come", "past_raw": "came", "pp_raw": "come", "past": "came", "pp": "come", "es": "venir", "ca": "venir", "ka": "მოსვლა"}, {"inf": "cost", "past_raw": "cost", "pp_raw": "cost", "past": "cost", "pp": "cost", "es": "costar", "ca": "costar", "ka": "ღირება"}, {"inf": "creep", "past_raw": "crept", "pp_raw": "crept", "past": "crept", "pp": "crept", "es": "arrastrarse", "ca": "arrossegar-se", "ka": "ცოცვა"}, {"inf": "cut", "past_raw": "cut", "pp_raw": "cut", "past": "cut", "pp": "cut", "es": "cortar", "ca": "tallar", "ka": "ჭრა"}, {"inf": "deal", "past_raw": "dealt", "pp_raw": "dealt", "past": "dealt", "pp": "dealt", "es": "tratar (con) / repartir", "ca": "tractar (amb) / repartir", "ka": "გარიგება / ვაჭრობა"}, {"inf": "do", "past_raw": "did", "pp_raw": "done", "past": "did", "pp": "done", "es": "hacer", "ca": "fer", "ka": "კეთება"}, {"inf": "draw", "past_raw": "drew", "pp_raw": "drawn", "past": "drew", "pp": "drawn", "es": "dibujar", "ca": "dibuixar", "ka": "ხატვა / ხაზვა"}, {"inf": "dream", "past_raw": "dreamt/dreamed", "pp_raw": "dreamt/dreamed", "past": "dreamt", "pp": "dreamt", "es": "soñar", "ca": "somiar", "ka": "ოცნება"}, {"inf": "drink", "past_raw": "drank", "pp_raw": "drunk", "past": "drank", "pp": "drunk", "es": "beber", "ca": "beure", "ka": "დალევა"}, {"inf": "drive", "past_raw": "drove", "pp_raw": "driven", "past": "drove", "pp": "driven", "es": "conducir", "ca": "conduir", "ka": "მართვა"}, {"inf": "eat", "past_raw": "ate", "pp_raw": "eaten", "past": "ate", "pp": "eaten", "es": "comer", "ca": "menjar", "ka": "ჭამა"}, {"inf": "fall", "past_raw": "fell", "pp_raw": "fallen", "past": "fell", "pp": "fallen", "es": "caer", "ca": "caure", "ka": "დაცემა"}, {"inf": "feed", "past_raw": "fed", "pp_raw": "fed", "past": "fed", "pp": "fed", "es": "alimentar", "ca": "alimentar", "ka": "კვება"}, {"inf": "feel", "past_raw": "felt", "pp_raw": "felt", "past": "felt", "pp": "felt", "es": "sentir", "ca": "sentir", "ka": "გრძნობა"}, {"inf": "fight", "past_raw": "fought", "pp_raw": "fought", "past": "fought", "pp": "fought", "es": "luchar", "ca": "lluitar", "ka": "ბრძოლა"}, {"inf": "find", "past_raw": "found", "pp_raw": "found", "past": "found", "pp": "found", "es": "encontrar", "ca": "trobar", "ka": "პოვნა"}, {"inf": "flee", "past_raw": "fled", "pp_raw": "fled", "past": "fled", "pp": "fled", "es": "huir", "ca": "fugir", "ka": "გაქცევა"}, {"inf": "fly", "past_raw": "flew", "pp_raw": "flown", "past": "flew", "pp": "flown", "es": "volar", "ca": "volar", "ka": "ფრენა"}, {"inf": "forget", "past_raw": "forgot", "pp_raw": "forgotten", "past": "forgot", "pp": "forgotten", "es": "olvidar", "ca": "oblidar", "ka": "დავიწყება"}, {"inf": "forgive", "past_raw": "forgave", "pp_raw": "forgiven", "past": "forgave", "pp": "forgiven", "es": "perdonar", "ca": "perdonar", "ka": "მიტევება"}, {"inf": "forsake", "past_raw": "forsook", "pp_raw": "forsaken", "past": "forsook", "pp": "forsaken", "es": "abandonar", "ca": "abandonar", "ka": "მიტოვება"}, {"inf": "freeze", "past_raw": "froze", "pp_raw": "frozen", "past": "froze", "pp": "frozen", "es": "congelar(se)", "ca": "congelar(-se)", "ka": "გაყინვა"}, {"inf": "get", "past_raw": "got", "pp_raw": "got", "past": "got", "pp": "got", "es": "conseguir / obtener", "ca": "aconseguir / obtenir", "ka": "მიღება"}, {"inf": "give", "past_raw": "gave", "pp_raw": "given", "past": "gave", "pp": "given", "es": "dar", "ca": "donar", "ka": "მიცემა"}, {"inf": "go", "past_raw": "went", "pp_raw": "gone", "past": "went", "pp": "gone", "es": "ir", "ca": "anar", "ka": "წასვლა"}, {"inf": "grind", "past_raw": "ground", "pp_raw": "ground", "past": "ground", "pp": "ground", "es": "moler / triturar", "ca": "moldre / triturar", "ka": "დაფქვა"}, {"inf": "grow", "past_raw": "grew", "pp_raw": "grown", "past": "grew", "pp": "grown", "es": "crecer", "ca": "créixer", "ka": "გაზრდა"}, {"inf": "hang", "past_raw": "hung", "pp_raw": "hung", "past": "hung", "pp": "hung", "es": "colgar", "ca": "penjar", "ka": "დაკიდება"}, {"inf": "have", "past_raw": "had", "pp_raw": "had", "past": "had", "pp": "had", "es": "tener", "ca": "tenir", "ka": "ქონა"}, {"inf": "hear", "past_raw": "heard", "pp_raw": "heard", "past": "heard", "pp": "heard", "es": "oír", "ca": "sentir (oïda)", "ka": "სმენა"}, {"inf": "hide", "past_raw": "hid", "pp_raw": "hidden", "past": "hid", "pp": "hidden", "es": "esconder", "ca": "amagar", "ka": "დამალვა"}, {"inf": "hit", "past_raw": "hit", "pp_raw": "hit", "past": "hit", "pp": "hit", "es": "golpear", "ca": "colpejar", "ka": "დარტყმა"}, {"inf": "hold", "past_raw": "held", "pp_raw": "held", "past": "held", "pp": "held", "es": "sostener / aguantar", "ca": "aguantar / sostenir", "ka": "დაჭერა / დაჭერა-შენარჩუნება"}, {"inf": "hurt", "past_raw": "hurt", "pp_raw": "hurt", "past": "hurt", "pp": "hurt", "es": "herir / doler", "ca": "ferir / fer mal", "ka": "ტკენა / დაზიანება"}, {"inf": "keep", "past_raw": "kept", "pp_raw": "kept", "past": "kept", "pp": "kept", "es": "mantener / guardar", "ca": "mantenir / guardar", "ka": "შენარჩუნება / შენახვა"}, {"inf": "kneel", "past_raw": "knelt", "pp_raw": "knelt", "past": "knelt", "pp": "knelt", "es": "arrodillarse", "ca": "agenollar-se", "ka": "დაჩოქება"}, {"inf": "know", "past_raw": "knew", "pp_raw": "known", "past": "knew", "pp": "known", "es": "saber / conocer", "ca": "saber / conèixer", "ka": "ცოდნა / გაცნობა"}, {"inf": "lead", "past_raw": "led", "pp_raw": "led", "past": "led", "pp": "led", "es": "liderar / guiar", "ca": "liderar / guiar", "ka": "წაყვანა / ხელმძღვანელობა"}, {"inf": "learn", "past_raw": "learnt/learned", "pp_raw": "learnt/learned", "past": "learnt", "pp": "learnt", "es": "aprender", "ca": "aprendre", "ka": "სწავლა"}, {"inf": "leave", "past_raw": "left", "pp_raw": "left", "past": "left", "pp": "left", "es": "dejar / irse", "ca": "deixar / marxar", "ka": "დატოვება"}, {"inf": "lend", "past_raw": "lent", "pp_raw": "lent", "past": "lent", "pp": "lent", "es": "prestar", "ca": "prestar", "ka": "სესხება"}, {"inf": "let", "past_raw": "let", "pp_raw": "let", "past": "let", "pp": "let", "es": "dejar / permitir", "ca": "deixar / permetre", "ka": "დაშვება / ნება დართვა"}, {"inf": "lie", "past_raw": "lay", "pp_raw": "lain", "past": "lay", "pp": "lain", "es": "tumbarse / yacer", "ca": "jeure / estirar-se", "ka": "წოლა"}, {"inf": "lose", "past_raw": "lost", "pp_raw": "lost", "past": "lost", "pp": "lost", "es": "perder", "ca": "perdre", "ka": "დაკარგვა"}, {"inf": "make", "past_raw": "made", "pp_raw": "made", "past": "made", "pp": "made", "es": "hacer / fabricar", "ca": "fer / fabricar", "ka": "გაკეთება / შექმნა"}, {"inf": "mean", "past_raw": "meant", "pp_raw": "meant", "past": "meant", "pp": "meant", "es": "significar", "ca": "significar / voler dir", "ka": "ნიშნავდეს"}, {"inf": "meet", "past_raw": "met", "pp_raw": "met", "past": "met", "pp": "met", "es": "conocer / encontrarse", "ca": "conèixer / trobar-se", "ka": "შეხვედრა / გაცნობა"}, {"inf": "pay", "past_raw": "paid", "pp_raw": "paid", "past": "paid", "pp": "paid", "es": "pagar", "ca": "pagar", "ka": "გადახდა"}, {"inf": "put", "past_raw": "put", "pp_raw": "put", "past": "put", "pp": "put", "es": "poner", "ca": "posar", "ka": "დადება / ჩადება"}, {"inf": "quit", "past_raw": "quit/quitted", "pp_raw": "quit/quitted", "past": "quit", "pp": "quit", "es": "dejar / abandonar", "ca": "deixar / abandonar", "ka": "შეწყვეტა / მიტოვება"}, {"inf": "read", "past_raw": "read", "pp_raw": "read", "past": "read", "pp": "read", "es": "leer", "ca": "llegir", "ka": "კითხვა"}, {"inf": "ride", "past_raw": "rode", "pp_raw": "ridden", "past": "rode", "pp": "ridden", "es": "montar (en bici/caballo)", "ca": "muntar (en bici/cavall)", "ka": "ტარება / ცხენოსნობა"}, {"inf": "ring", "past_raw": "rang", "pp_raw": "rung", "past": "rang", "pp": "rung", "es": "sonar / llamar", "ca": "sonar / trucar", "ka": "დარეკვა"}, {"inf": "rise", "past_raw": "rose", "pp_raw": "risen", "past": "rose", "pp": "risen", "es": "levantarse / subir", "ca": "aixecar-se / pujar", "ka": "ამაღლება / აწევა"}, {"inf": "run", "past_raw": "ran", "pp_raw": "run", "past": "ran", "pp": "run", "es": "correr", "ca": "córrer", "ka": "სირბილი"}, {"inf": "say", "past_raw": "said", "pp_raw": "said", "past": "said", "pp": "said", "es": "decir", "ca": "dir", "ka": "თქმა"}, {"inf": "see", "past_raw": "saw", "pp_raw": "seen", "past": "saw", "pp": "seen", "es": "ver", "ca": "veure", "ka": "ნახვა"}, {"inf": "sell", "past_raw": "sold", "pp_raw": "sold", "past": "sold", "pp": "sold", "es": "vender", "ca": "vendre", "ka": "გაყიდვა"}, {"inf": "send", "past_raw": "sent", "pp_raw": "sent", "past": "sent", "pp": "sent", "es": "enviar", "ca": "enviar", "ka": "გაგზავნა"}, {"inf": "set", "past_raw": "set", "pp_raw": "set", "past": "set", "pp": "set", "es": "poner / establecer", "ca": "posar / establir", "ka": "დაყენება / დაყენება-ჩაყენება"}, {"inf": "sew", "past_raw": "sewed", "pp_raw": "sewn/sewed", "past": "sewed", "pp": "sewn", "es": "coser", "ca": "cosir", "ka": "კერვა"}, {"inf": "shake", "past_raw": "shook", "pp_raw": "shaken", "past": "shook", "pp": "shaken", "es": "sacudir", "ca": "sacsejar", "ka": "შერყევა"}, {"inf": "shine", "past_raw": "shone", "pp_raw": "shone", "past": "shone", "pp": "shone", "es": "brillar", "ca": "brillar", "ka": "ბრწყინვა"}, {"inf": "shoot", "past_raw": "shot", "pp_raw": "shot", "past": "shot", "pp": "shot", "es": "disparar", "ca": "disparar", "ka": "სროლა"}, {"inf": "show", "past_raw": "showed", "pp_raw": "shown/showed", "past": "showed", "pp": "shown", "es": "mostrar", "ca": "mostrar", "ka": "ჩვენება"}, {"inf": "shrink", "past_raw": "shrank/shrunk", "pp_raw": "shrunk", "past": "shrank", "pp": "shrunk", "es": "encoger", "ca": "encongir-se", "ka": "შეკუმშვა / დაპატარავება"}, {"inf": "shut", "past_raw": "shut", "pp_raw": "shut", "past": "shut", "pp": "shut", "es": "cerrar", "ca": "tancar", "ka": "დახურვა"}, {"inf": "sing", "past_raw": "sang", "pp_raw": "sung", "past": "sang", "pp": "sung", "es": "cantar", "ca": "cantar", "ka": "სიმღერა"}, {"inf": "sink", "past_raw": "sank", "pp_raw": "sunk", "past": "sank", "pp": "sunk", "es": "hundirse", "ca": "enfonsar-se", "ka": "ჩაძირვა"}, {"inf": "sit", "past_raw": "sat", "pp_raw": "sat", "past": "sat", "pp": "sat", "es": "sentarse", "ca": "seure", "ka": "ჯდომა"}, {"inf": "sleep", "past_raw": "slept", "pp_raw": "slept", "past": "slept", "pp": "slept", "es": "dormir", "ca": "dormir", "ka": "ძილი"}, {"inf": "slide", "past_raw": "slid", "pp_raw": "slid", "past": "slid", "pp": "slid", "es": "deslizar(se)", "ca": "lliscar", "ka": "სრიალი"}, {"inf": "sow", "past_raw": "sowed", "pp_raw": "sown/sowed", "past": "sowed", "pp": "sown", "es": "sembrar", "ca": "sembrar", "ka": "თესვა"}, {"inf": "speak", "past_raw": "spoke", "pp_raw": "spoken", "past": "spoke", "pp": "spoken", "es": "hablar", "ca": "parlar", "ka": "ლაპარაკი"}, {"inf": "spell", "past_raw": "spelt/spelled", "pp_raw": "spelt/spelled", "past": "spelt", "pp": "spelt", "es": "deletrear", "ca": "lletrejar", "ka": "მარცვლებით დაწერა"}, {"inf": "spend", "past_raw": "spent", "pp_raw": "spent", "past": "spent", "pp": "spent", "es": "gastar / pasar (tiempo)", "ca": "gastar / passar (temps)", "ka": "დახარჯვა"}, {"inf": "spill", "past_raw": "spilt/spilled", "pp_raw": "spilt/spilled", "past": "spilt", "pp": "spilt", "es": "derramar", "ca": "vessar", "ka": "დაღვრა"}, {"inf": "split", "past_raw": "split", "pp_raw": "split", "past": "split", "pp": "split", "es": "dividir / partir", "ca": "dividir / partir", "ka": "გაყოფა"}, {"inf": "spoil", "past_raw": "spoilt/spoiled", "pp_raw": "spoilt/spoiled", "past": "spoilt", "pp": "spoilt", "es": "estropear", "ca": "espatllar", "ka": "გაფუჭება"}, {"inf": "spread", "past_raw": "spread", "pp_raw": "spread", "past": "spread", "pp": "spread", "es": "extender / difundir", "ca": "estendre / escampar", "ka": "გავრცელება"}, {"inf": "stand", "past_raw": "stood", "pp_raw": "stood", "past": "stood", "pp": "stood", "es": "estar de pie", "ca": "estar dret", "ka": "დგომა"}, {"inf": "steal", "past_raw": "stole", "pp_raw": "stolen", "past": "stole", "pp": "stolen", "es": "robar", "ca": "robar", "ka": "ქურდობა"}, {"inf": "sting", "past_raw": "stung", "pp_raw": "stung", "past": "stung", "pp": "stung", "es": "picar", "ca": "picar", "ka": "დაკბენა / ნესტრით ჩხვლეტა"}, {"inf": "stink", "past_raw": "stank/stunk", "pp_raw": "stunk", "past": "stank", "pp": "stunk", "es": "apestar / oler mal", "ca": "fer pudor", "ka": "ყროლა"}, {"inf": "strike", "past_raw": "struck", "pp_raw": "struck", "past": "struck", "pp": "struck", "es": "golpear", "ca": "colpejar", "ka": "დარტყმა"}, {"inf": "swear", "past_raw": "swore", "pp_raw": "sworn", "past": "swore", "pp": "sworn", "es": "jurar", "ca": "jurar", "ka": "ფიცება"}, {"inf": "sweep", "past_raw": "swept", "pp_raw": "swept", "past": "swept", "pp": "swept", "es": "barrer", "ca": "escombrar", "ka": "მოხვეტა"}, {"inf": "swim", "past_raw": "swam", "pp_raw": "swum", "past": "swam", "pp": "swum", "es": "nadar", "ca": "nedar", "ka": "ცურვა"}, {"inf": "take", "past_raw": "took", "pp_raw": "taken", "past": "took", "pp": "taken", "es": "tomar / coger", "ca": "agafar / prendre", "ka": "აღება"}, {"inf": "teach", "past_raw": "taught", "pp_raw": "taught", "past": "taught", "pp": "taught", "es": "enseñar", "ca": "ensenyar", "ka": "სწავლება"}, {"inf": "tear", "past_raw": "tore", "pp_raw": "torn", "past": "tore", "pp": "torn", "es": "rasgar", "ca": "esquinçar", "ka": "დახევა"}, {"inf": "tell", "past_raw": "told", "pp_raw": "told", "past": "told", "pp": "told", "es": "decir / contar", "ca": "dir / explicar", "ka": "მოყოლა / თქმა"}, {"inf": "think", "past_raw": "thought", "pp_raw": "thought", "past": "thought", "pp": "thought", "es": "pensar", "ca": "pensar", "ka": "ფიქრი"}, {"inf": "throw", "past_raw": "threw", "pp_raw": "thrown", "past": "threw", "pp": "thrown", "es": "tirar / lanzar", "ca": "llençar", "ka": "გადაგდება"}, {"inf": "tread", "past_raw": "trode", "pp_raw": "trodden/trod", "past": "trode", "pp": "trodden", "es": "pisar", "ca": "trepitjar", "ka": "ფეხის დადგმა / გათელვა"}, {"inf": "understand", "past_raw": "understood", "pp_raw": "understood", "past": "understood", "pp": "understood", "es": "entender", "ca": "entendre", "ka": "გაგება"}, {"inf": "wake", "past_raw": "woke", "pp_raw": "woken", "past": "woke", "pp": "woken", "es": "despertar(se)", "ca": "despertar(-se)", "ka": "გაღვიძება"}, {"inf": "wear", "past_raw": "wore", "pp_raw": "worn", "past": "wore", "pp": "worn", "es": "llevar puesto / vestir", "ca": "portar (roba) / vestir", "ka": "ტარება / ჩაცმა"}, {"inf": "weave", "past_raw": "wove", "pp_raw": "woven", "past": "wove", "pp": "woven", "es": "tejer", "ca": "teixir", "ka": "ქსოვა"}, {"inf": "weep", "past_raw": "wept", "pp_raw": "wept", "past": "wept", "pp": "wept", "es": "llorar", "ca": "plorar", "ka": "ტირილი"}, {"inf": "win", "past_raw": "won", "pp_raw": "won", "past": "won", "pp": "won", "es": "ganar", "ca": "guanyar", "ka": "მოგება"}, {"inf": "wring", "past_raw": "wrung", "pp_raw": "wrung", "past": "wrung", "pp": "wrung", "es": "retorcer / escurrir", "ca": "torçar / escórrer", "ka": "გამოწურვა"}, {"inf": "write", "past_raw": "wrote", "pp_raw": "written", "past": "wrote", "pp": "written", "es": "escribir", "ca": "escriure", "ka": "წერა"}];
+
+/* Correccions de traducció al català (evita ambigüitats sense revelar la resposta) */
+const CA_OVERRIDES = {
+  "hit": "tocar / colpejar",
+  "strike": "colpejar",
+  "beat": "batre / vèncer"
+};
+function displayCa(v){
+  const inf = v && v.inf ? v.inf : "";
+  return (CA_OVERRIDES[inf] || (v && v.ca) || (v && v.inf) || "").trim();
+}
+const DEV_UNLOCK = new URLSearchParams(location.search).get("dev") === "1";
+if(DEV_UNLOCK) document.getElementById("devHint").classList.remove("hidden");
+
+const LANG_KEY = "irregular_verbs_lang_v1";
+const UI = {
+  ca: {
+    title: "Verbs Irregulars anglesos",
+  subtitle: "6 nivells. No pugis de nivell fins haver encertat tots els verbs almenys 1 cop.",
+    howItWorks: "Instruccions",
+    favOnly: "Només ⭐",
+    resetStars: "Reinicia ⭐",
+    reset: "Reinicia",
+    resetModalTitle: "Reinicia progrés",
+    resetConfirmBody: (lvl)=>`Vols reiniciar el progrés del <b>${UI[getLang()].level(lvl)}</b>?`,
+    resetWarn: "Això no es pot desfer. Els altres nivells es conservaran.",
+    resetConfirmBtn: "Sí, reinicia",
+    cancel: "Cancel·la",
+    levelCompleteTitle: "Nivell completat!",
+    levelCompleteBody: (lvl)=>`Has completat el <b>${UI[getLang()].level(lvl)}</b>. Vols reiniciar aquest nivell o passar al següent?`,
+
+    nextLevelBtn: "Següent nivell",
+    resetThisLevelBtn: "Reinicia aquest nivell",
+    list: "Llista de verbs",
+    tenseInf: "Infinitiu",
+    tensePast: "Passat simple",
+    tensePP: "Participi passat",
+    progress: "Progrés del nivell",
+    correctWrong: (c,w)=>`Encerts: ${c} · Errors: ${w}`,
+    masteredLine: (m,t)=>`Dominats aquest nivell: ${m} / ${t}`,
+    question: "Pregunta:",
+    next: "Següent",
+    selectLevelToStart: "Selecciona un nivell per començar",
+    lockedLevel: "🔒 Aquest nivell està bloquejat. Completa el nivell anterior primer.",
+    helpTitle: "Instruccions",
+    helpBody: `<ul class="list-disc pl-5 space-y-1">
+      <li><b>N1</b>: tria el significat en català.</li>
+      <li><b>N2</b>: tria l'infinitiu en anglès a partir del català.</li>
+      <li><b>N3</b>: completa el verb en anglès amb lletres.</li>
+      <li><b>N4</b>: tria el <b>Simple Past</b> correcte.</li>
+      <li><b>N5</b>: tria el <b>Past Participle</b> correcte.</li>
+      <li><b>N6</b>: omple infinitive + simple past + past participle (pots provar tantes vegades com calgui).</li>
+    </ul>`,
+    ok: "D'acord",
+    lvlCompleted: (lvl)=>UI[getLang()].lvlCompleted(lvl),
+    lvlCompletedBody: (lvl)=>`<p>Has encertat <b>tots</b> els verbs almenys una vegada.</p><p class="mt-2">Ja pots desbloquejar el <b>Nivell ${lvl+1}</b>.</p>
+      <div class="mt-4 flex flex-wrap gap-2 justify-end">
+        <button id="btnResetAfterComplete" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 transition">${UI[getLang()].resetThisLevelBtn}</button>
+        <button id="btnNextLevel" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">${UI[getLang()].nextLevelBtn}</button>
+      </div>
+    `,
+    gameDoneTitle: "🎉 Joc completat!",
+    gameDoneBody: "<p>Has completat tots els nivells amb tots els verbs!</p>",
+    level: (lvl)=>`Nivell ${lvl}`,
+    hintL1: "Tria el significat en català:",
+    hintL2: "Tria el verb en anglès (infinitiu):",
+    hintL3: "Completa el verb en anglès amb les lletres:",
+    hintL4: "Tria el SIMPLE PAST correcte:",
+    hintL5: "Tria el PAST PARTICIPLE correcte:",
+    hintL6: "Omple <b>infinitive + simple past + past participle</b>. Pots comprovar tantes vegades com calgui fins encertar les 3.",
+    good: "😊 Molt bé!",
+    notCorrect: "😢 No és correcte.",
+    needAllSelects: "😕 Selecciona una opció a cada desplegable.",
+    stillNot: "😢 Encara no. Revisa els selectors en vermell i torna a provar.",
+    lvl6Good: "😊 Molt bé! (Nivell 6 completat per aquest verb)",
+    pronounceTitle: "Escoltar pronunciació",
+    letterExplain: '<span id="lblLetterExplain">Clica les lletres correctes. Si és correcta, es posarà automàticament al seu lloc. Les incorrectes es marcaran amb una <span class="text-red-600 font-black">✖</span>.</span>',
+    listTitle: "Llista de verbs irregulars",
+    listSubtitle: "Infinitive, Simple Past, Past Participle i significat.",
+    starCol: "⭐",
+    meaningCol: "Significat",
+    searchPh: "Cerca (infinitiu / formes / significat)...",
+    close: "Tancar",
+    colors: {
+      label: "Colors:",
+      easy: "Fàcils (3 iguals)",
+      mid: "Mitjans (2 iguals)",
+      hard: "Difícils (3 diferents)"
+    },
+    meaningHeader: "Català"
+  },
+  es: {
+    title: "Verbos Irregulares ingleses",
+  subtitle: "6 niveles. No subas de nivel hasta haber acertado todos los verbos al menos 1 vez.",
+    howItWorks: "Instrucciones",
+    favOnly: "Solo ⭐",
+    resetStars: "Reiniciar ⭐",
+    reset: "Reinicia",
+    resetModalTitle: "Reiniciar progreso",
+    resetConfirmBody: (lvl)=>`¿Quieres reiniciar el progreso del <b>${UI[getLang()].level(lvl)}</b>?`,
+    resetWarn: "Esto no se puede deshacer. Los demás niveles se conservarán.",
+    resetConfirmBtn: "Sí, reiniciar",
+    cancel: "Cancelar",
+    levelCompleteTitle: "¡Nivel completado!",
+    levelCompleteBody: (lvl)=>`Has completado el <b>${UI[getLang()].level(lvl)}</b>. ¿Quieres reiniciar este nivel o pasar al siguiente?`,
+
+    nextLevelBtn: "Siguiente nivel",
+    resetThisLevelBtn: "Reiniciar este nivel",
+    list: "Lista de verbos",
+    tenseInf: "Infinitivo",
+    tensePast: "Pasado simple",
+    tensePP: "Participio pasado",
+    progress: "Progreso del nivel",
+    correctWrong: (c,w)=>`Aciertos: ${c} · Errores: ${w}`,
+    masteredLine: (m,t)=>`Dominados en este nivel: ${m} / ${t}`,
+    question: "Pregunta:",
+    next: "Siguiente",
+    selectLevelToStart: "Selecciona un nivel para empezar",
+    lockedLevel: "🔒 Este nivel está bloqueado. Completa el nivel anterior primero.",
+    helpTitle: "Instrucciones",
+    helpBody: `<ul class="list-disc pl-5 space-y-1">
+      <li><b>N1</b>: elige el significado en catalán.</li>
+      <li><b>N2</b>: elige el infinitivo en inglés a partir del catalán.</li>
+      <li><b>N3</b>: completa el verbo en inglés con letras.</li>
+      <li><b>N4</b>: elige el <b>Simple Past</b> correcto.</li>
+      <li><b>N5</b>: elige el <b>Past Participle</b> correcto.</li>
+      <li><b>N6</b>: rellena infinitive + simple past + past participle (puedes intentarlo las veces que haga falta).</li>
+    </ul>`,
+    ok: "Vale",
+    lvlCompleted: (lvl)=>`¡Nivel ${lvl} completado!`,
+    lvlCompletedBody: (lvl)=>`<p>Has acertado <b>todos</b> los verbos al menos una vez.</p><p class="mt-2">Ya puedes desbloquear el <b>Nivel ${lvl+1}</b>.</p>
+      <div class="mt-4 flex flex-wrap gap-2 justify-end">
+        <button id="btnResetAfterComplete" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 transition">${UI[getLang()].resetThisLevelBtn}</button>
+        <button id="btnNextLevel" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">${UI[getLang()].nextLevelBtn}</button>
+      </div>
+    `,
+    gameDoneTitle: "🎉 ¡Juego completado!",
+    gameDoneBody: "<p>Has completado todos los niveles con todos los verbos.</p>",
+    level: (lvl)=>`Nivel ${lvl}`,
+    hintL1: "Elige el significado en catalán:",
+    hintL2: "Elige el verbo en inglés (infinitivo):",
+    hintL3: "Completa el verbo en inglés con las letras:",
+    hintL4: "Elige el SIMPLE PAST correcto:",
+    hintL5: "Elige el PAST PARTICIPLE correcto:",
+    hintL6: "Rellena <b>infinitive + simple past + past participle</b>. Puedes comprobarlo tantas veces como haga falta hasta acertar las 3.",
+    good: "😊 ¡Muy bien!",
+    notCorrect: "😢 No es correcto.",
+    needAllSelects: "😕 Selecciona una opción en cada desplegable.",
+    stillNot: "😢 Aún no. Revisa los selectores en rojo y vuelve a probar.",
+    lvl6Good: "😊 ¡Muy bien! (Nivel 6 completado para este verbo)",
+    pronounceTitle: "Escuchar pronunciación",
+    letterExplain: 'Haz clic en las letras correctas. Si es correcta, se colocará automáticamente en su sitio. Las incorrectas se marcarán con una <span class="text-red-600 font-black">✖</span>.',
+    listTitle: "Lista de verbos irregulares",
+    listSubtitle: "Infinitive, Simple Past, Past Participle y significado.",
+    starCol: "⭐",
+    meaningCol: "Significado",
+    searchPh: "Buscar (infinitivo / formas / significado)...",
+    close: "Cerrar",
+    colors: { label:"Colores:", easy:"Fáciles (3 iguales)", mid:"Medios (2 iguales)", hard:"Difíciles (3 diferentes)" },
+    meaningHeader: "Castellano"
+  },
+  ka: {
+    title: "ინგლისური არარეგულარული ზმნები",
+  subtitle: "6 დონე. არ გადახვიდეთ დონეზე მანამ, სანამ ყველა ზმნას ერთხელ მაინც სწორად არ უპასუხებთ.",
+    howItWorks: "ინსტრუქციები",
+    favOnly: "მხოლოდ ⭐",
+    resetStars: "⭐ გადატვირთვა",
+    reset: "გადატვირთეთ",
+    resetModalTitle: "გადატვირთეთ",
+    resetConfirmBody: (lvl)=>`გინდა <b>${UI[getLang()].level(lvl)}</b>-ის პროგრესის გადატვირთვა?`,
+    resetWarn: "ეს ქმედება ვერ გაუქმდება. სხვა დონეები შენარჩუნდება.",
+    resetConfirmBtn: "დიახ, გადატვირთე",
+    cancel: "გაუქმება",
+    levelCompleteTitle: "დონე დასრულებულია!",
+    levelCompleteBody: (lvl)=>`შენ დაასრულე <b>${UI[getLang()].level(lvl)}</b>. გინდა ამ დონის გადატვირთვა თუ შემდეგ დონეზე გადასვლა?`,
+
+    nextLevelBtn: "შემდეგი დონე",
+    resetThisLevelBtn: "ამ დონის გადატვირთვა",
+    list: "ზმნების სია",
+    tenseInf: "ინფინიტივი",
+    tensePast: "მარტივი წარსული",
+    tensePP: "წარსული მიმღეობა",
+    progress: "დონის პროგრესი",
+    correctWrong: (c,w)=>`სწორი: ${c} · შეცდომა: ${w}`,
+    masteredLine: (m,t)=>`ამ დონეზე დამახსოვრებული: ${m} / ${t}`,
+    question: "კითხვა:",
+    next: "შემდეგი",
+    selectLevelToStart: "აირჩიე დონე დასაწყებად",
+    lockedLevel: "🔒 ეს დონე დაბლოკილია. ჯერ დაასრულე წინა დონე.",
+    helpTitle: "ინსტრუქციები",
+    helpBody: `<ul class="list-disc pl-5 space-y-1">
+      <li><b>N1</b>: აირჩიე მნიშვნელობა კატალანურად.</li>
+      <li><b>N2</b>: აირჩიე ინგლისური ინფინიტივი კატალანურიდან.</li>
+      <li><b>N3</b>: შეადგინე ინგლისური ზმნა ასოებით.</li>
+      <li><b>N4</b>: აირჩიე სწორი <b>Simple Past</b>.</li>
+      <li><b>N5</b>: აირჩიე სწორი <b>Past Participle</b>.</li>
+      <li><b>N6</b>: შეავსე infinitive + simple past + past participle (შეგიძლია რამდენჯერაც გინდა სცადო).</li>
+    </ul>`,
+    ok: "კარგი",
+    lvlCompleted: (lvl)=>`დონე ${lvl} დასრულებულია!`,
+    lvlCompletedBody: (lvl)=>`<p>ყველა ზმნა მინიმუმ ერთხელ სწორად გამოიცანი.</p><p class="mt-2">ახლა შეგიძლია გახსნა <b>დონე ${lvl+1}</b>.</p>
+      <div class="mt-4 flex flex-wrap gap-2 justify-end">
+        <button id="btnResetAfterComplete" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 transition">${UI[getLang()].resetThisLevelBtn}</button>
+        <button id="btnNextLevel" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">${UI[getLang()].nextLevelBtn}</button>
+      </div>
+    `,
+    gameDoneTitle: "🎉 თამაში დასრულებულია!",
+    gameDoneBody: "<p>ყველა დონე და ყველა ზმნა დასრულებულია.</p>",
+    level: (lvl)=>`დონე ${lvl}`,
+    hintL1: "აირჩიე მნიშვნელობა კატალანურად:",
+    hintL2: "აირჩიე ზმნა ინგლისურად (ინფინიტივი):",
+    hintL3: "შეადგინე ზმნა ინგლისურად ასოებით:",
+    hintL4: "აირჩიე სწორი SIMPLE PAST:",
+    hintL5: "აირჩიე სწორი PAST PARTICIPLE:",
+    hintL6: "შეავსე <b>infinitive + simple past + past participle</b>. შეამოწმე რამდენჯერაც გინდა, სანამ სამივე სწორია.",
+    good: "😊 კარგი!",
+    notCorrect: "😢 არასწორია.",
+    needAllSelects: "😕 თითოეულ ჩამოსაშლელში აირჩიე ვარიანტი.",
+    stillNot: "😢 ჯერ არა. გადაამოწმე წითლად მონიშნული და სცადე თავიდან.",
+    lvl6Good: "😊 კარგი! (დონე 6 დასრულებულია ამ ზმნისთვის)",
+    pronounceTitle: "გამოთქმის მოსმენა",
+    letterExplain: 'დააჭირე სწორ ასოებს. თუ სწორია, ავტომატურად დადგება თავის ადგილზე. არასწორი ასოები მონიშნდება <span class="text-red-600 font-black">✖</span>-ით.',
+    listTitle: "არარეგულარული ზმნების სია",
+    listSubtitle: "Infinitive, Simple Past, Past Participle და მნიშვნელობა.",
+    starCol: "⭐",
+    meaningCol: "მნიშვნელობა",
+    searchPh: "ძებნა (infinitive / forms / meaning)...",
+    close: "დახურვა",
+    colors: { label:"ფერები:", easy:"მარტივი (3 ერთნაირი)", mid:"საშუალო (2 ერთნაირი)", hard:"რთული (3 განსხვავებული)" },
+    meaningHeader: "მნიშვნელობა"
+  }
+};
+function getLang(){
+  const saved = localStorage.getItem(LANG_KEY);
+  return (saved==="ca"||saved==="es"||saved==="ka") ? saved : "ca";
+}
+function setLang(lang){
+  if(!(lang==="ca"||lang==="es"||lang==="ka")) lang="ca";
+  localStorage.setItem(LANG_KEY, lang);
+}
+function t(key){
+  const lang = getLang();
+  return UI[lang][key] ?? UI.ca[key] ?? key;
+}
+function meaningForLang(v){
+  const lang = getLang();
+  if(lang==="es") return (v.es || v.ca || v.inf || "").trim();
+  if(lang==="ka") return (v.ka || v.es || v.ca || v.inf || "").trim();
+  return displayCa(v);
+}
+
+const STORE_KEY = "irregular_verbs_game_v4";
+
+const els = {
+  levelBar: document.getElementById("levelBar"),
+  levelBtns: () => Array.from(document.querySelectorAll(".levelBtn")),
+  btnReset: document.getElementById("btnReset"),
+  btnList: document.getElementById("btnList"),
+  btnHelp: document.getElementById("btnHelp"),
+  btnSpeak: document.getElementById("btnSpeak"),
+  btnStar: document.getElementById("btnStar"),
+  studyControls: document.getElementById("studyControls"),
+  chkFavOnly: document.getElementById("chkFavOnly"),
+  lblFavOnly: document.getElementById("lblFavOnly"),
+  btnResetStars: document.getElementById("btnResetStars"),
+  quizHeaderGrid: document.getElementById("quizHeaderGrid"),
+  quizArea: document.getElementById("quizArea"),
+    mcqWrap: document.getElementById("answers"),
+  mcqOptions: document.getElementById("answers"),
+levelTitle: document.getElementById("levelTitle"),
+  questionText: document.getElementById("questionText"),
+  questionHint: document.getElementById("questionHint"),
+  answers: document.getElementById("answers"),
+  feedback: document.getElementById("feedback"),
+  btnNext: document.getElementById("btnNext"),
+    levelHeaderLeft: document.getElementById("levelHeaderLeft"),
+    quizFooter: document.getElementById("quizFooter"),
+    progressSection: document.getElementById("progressSection"),
+  qIndex: document.getElementById("qIndex"),
+  qTotal: document.getElementById("qTotal"),
+  progressBar: document.getElementById("progressBar"),
+  progressPct: document.getElementById("progressPct"),
+  scoreLine: document.getElementById("scoreLine"),
+  masterLine: document.getElementById("masterLine"),
+  modal: document.getElementById("modal"),
+  modalTitle: document.getElementById("modalTitle"),
+  modalBody: document.getElementById("modalBody"),
+  modalClose: document.getElementById("modalClose"),
+  modalOk: document.getElementById("modalOk"),
+  level6Area: document.getElementById("level6Area"),
+    selInf: document.getElementById("selInf"),
+  selPast: document.getElementById("selPast"),
+  selPP: document.getElementById("selPP"),
+  btnSpeakInf: document.getElementById("btnSpeakInf"),
+  btnSpeakPast: document.getElementById("btnSpeakPast"),
+  btnSpeakPP: document.getElementById("btnSpeakPP"),
+// nivell 3
+  level3Letters: document.getElementById("level3Letters"),
+  letterSlots: document.getElementById("letterSlots"),
+  letterBank: document.getElementById("letterBank"),
+  btnL3Audio: document.getElementById("btnL3Audio"),
+  btnL3Help: document.getElementById("btnL3Help"),
+  tenseInf: document.getElementById("tenseInf"),
+  tensePast: document.getElementById("tensePast"),
+  tensePP: document.getElementById("tensePP"),
+  btnCheckLevel6: document.getElementById("btnCheckLevel6"),
+  tenseFilters: document.getElementById('tenseFilters'),
+  tenseChks: Array.from(document.querySelectorAll('.tenseChk')),
+  tenseInf: document.getElementById('tenseInf'),
+  tensePast: document.getElementById('tensePast'),
+  tensePP: document.getElementById('tensePP'),
+  tenseInfLbl: document.getElementById('tenseInfLbl'),
+  tensePastLbl: document.getElementById('tensePastLbl'),
+  tensePPLbl: document.getElementById('tensePPLbl')
+};
+
+// FIX49: Move tense filter box to the LEFT under "Nivell" header (only in Level 3)
+let __tenseFiltersHome = null;
+function placeTenseFilters(lvl){
+  const tf = els.tenseFilters;
+  if(!tf) return;
+  if(!__tenseFiltersHome) __tenseFiltersHome = tf.parentElement;
+
+  const titleEl = document.getElementById("levelTitle");
+  const resetBtn = document.getElementById("btnReset");
+  let topRow = document.getElementById("lvlTopRow");
+
+  if(lvl===3){
+    // Make the left header a vertical stack
+    els.levelHeaderLeft.classList.add("lvl3LeftCol");
+
+    tf.classList.remove("hidden");
+
+    // Ensure a top row that keeps "Nivell 3" + "Reinicia" side by side
+    if(!topRow){
+      topRow = document.createElement("div");
+      topRow.id = "lvlTopRow";
+      els.levelHeaderLeft.insertBefore(topRow, els.levelHeaderLeft.firstChild);
+    }
+    if(titleEl && titleEl.parentElement !== topRow) topRow.appendChild(titleEl);
+    if(resetBtn && resetBtn.parentElement !== topRow) topRow.appendChild(resetBtn);
+
+    // Place filters UNDER the top row (LEFT)
+    if(tf.parentElement !== els.levelHeaderLeft) els.levelHeaderLeft.appendChild(tf);
+    // Ensure it's after the topRow
+    if(els.levelHeaderLeft.lastElementChild !== tf) els.levelHeaderLeft.appendChild(tf);
+
+  } else {
+    els.levelHeaderLeft.classList.remove("lvl3LeftCol");
+
+    if(__tenseFiltersHome && tf.parentElement !== __tenseFiltersHome){
+      __tenseFiltersHome.appendChild(tf);
+    }
+    tf.classList.add("hidden");
+
+    if(topRow){
+      // restore title/reset back directly into left header
+      if(titleEl) els.levelHeaderLeft.insertBefore(titleEl, els.levelHeaderLeft.firstChild);
+      if(resetBtn) els.levelHeaderLeft.insertBefore(resetBtn, titleEl ? titleEl.nextSibling : els.levelHeaderLeft.firstChild);
+      topRow.remove();
+    }
+  }
+}
+
+
+// FIX23: Toggle Level 3 mode (hide top speak button + compact layout)
+// FIX26: Toggle body classes by current level (for CSS behaviors)
+function applyLevelMode(){
+  const lvl = state && state.currentLevel ? state.currentLevel : 0;
+  document.body.classList.toggle('lvl2', lvl===2);
+  document.body.classList.toggle('lvl3', lvl===3);
+  try{ placeTenseFilters(lvl); }catch(e){}
+  document.body.classList.toggle('lvl6', lvl===6);
+  // hide/show speak button safely via updateSpeakButton
+  try{ updateSpeakButton(state.current);
+  // FIX40: auto audio for question
+  try{ if(isAutoAudio() && els.btnSpeak && !els.btnSpeak.classList.contains('hidden')) els.btnSpeak.click(); }catch(e){} }catch(e){}
+}
+
+
+function initialState() {
+  const progress = {};
+  const retries = {};
+  const stars = {};
+  const favOnly = {};
+  for (const lvl of [1,2,3,4,5,6]) {
+    progress[lvl] = { mastered: {}, correct: 0, wrong: 0 };
+    retries[lvl] = [];
+    stars[lvl] = {};      // questionKey -> boolean (true=include)
+    favOnly[lvl] = false; // per-level filter (false=all, true=only starred)
+  }
+  return {
+    tenseSel: { inf: true, past: true, pp: true },
+    currentLevel: null,
+    queue: [],
+    current: null,
+    answered: false,
+    progress,
+    retries,
+    stars,
+    favOnly,
+    qPos: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 },
+    levelCompleteShown: { 1:false, 2:false, 3:false, 4:false, 5:false, 6:false }
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return initialState();
+    const st = JSON.parse(raw);
+    if(!st.progress) st.progress = initialState().progress;
+    if(!st.retries) st.retries = initialState().retries;
+    if(!st.qPos) st.qPos = initialState().qPos;
+    if(!st.levelCompleteShown) st.levelCompleteShown = initialState().levelCompleteShown;
+    if(!st.tenseSel) st.tenseSel = initialState().tenseSel;
+    if(!st.stars) st.stars = initialState().stars;
+    if(!st.favOnly) st.favOnly = initialState().favOnly;
+    for (const lvl of [1,2,3,4,5,6]) {
+      st.progress[lvl] = st.progress[lvl] || { mastered: {}, correct: 0, wrong: 0 };
+      st.progress[lvl].mastered = st.progress[lvl].mastered || {};
+      st.progress[lvl].correct = st.progress[lvl].correct || 0;
+      st.progress[lvl].wrong = st.progress[lvl].wrong || 0;
+      st.retries[lvl] = Array.isArray(st.retries[lvl]) ? st.retries[lvl] : [];
+      st.stars[lvl] = st.stars[lvl] || {};
+      st.favOnly[lvl] = !!st.favOnly[lvl];
+    }
+    // Sempre iniciem sense nivell seleccionat (però mantenim el progrés guardat)
+    st.currentLevel = null;
+    st.queue = [];
+    st.current = null;
+    st.answered = false;
+    return st;
+  } catch(e) {
+    return initialState();
+  }
+}
+
+function syncTopButtonsWidth(){
+  const a = document.getElementById("btnHelp");
+  const b = document.getElementById("btnList");
+  if(!a || !b) return;
+
+  // Measure a "reference" width using the Georgian word for Instructions (same font/padding),
+  // so buttons keep the same width across languages.
+  const refText = (UI && UI.ka && UI.ka.howItWorks) ? UI.ka.howItWorks : "ინსტრუქციები";
+
+  // Temporarily reset to natural width
+  a.style.width = "auto";
+  b.style.width = "auto";
+
+  const probe = document.createElement("span");
+  probe.textContent = refText;
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.whiteSpace = "nowrap";
+  // Copy key computed styles from button A so measurement matches
+  const cs = window.getComputedStyle(a);
+  probe.style.font = cs.font;
+  probe.style.fontSize = cs.fontSize;
+  probe.style.fontFamily = cs.fontFamily;
+  probe.style.fontWeight = cs.fontWeight;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.style.paddingLeft = cs.paddingLeft;
+  probe.style.paddingRight = cs.paddingRight;
+  probe.style.borderLeftWidth = cs.borderLeftWidth;
+  probe.style.borderRightWidth = cs.borderRightWidth;
+  probe.style.boxSizing = cs.boxSizing;
+
+  document.body.appendChild(probe);
+  const refW = Math.ceil(probe.getBoundingClientRect().width);
+  probe.remove();
+
+  // Ensure we never truncate longer labels (take max with current widest)
+  const currentW = Math.ceil(Math.max(a.getBoundingClientRect().width, b.getBoundingClientRect().width));
+  const w = Math.max(refW, currentW);
+
+  a.style.width = `${w}px`;
+  b.style.width = `${w}px`;
+}
+
+function applyLanguage(){
+  const lang = getLang();
+  document.documentElement.lang = lang;
+  const sel = document.getElementById("langSel");
+  if(sel && sel.value !== lang) sel.value = lang;
+
+  // Header texts
+  const titleEl = document.getElementById("appTitle");
+  const subEl = document.getElementById("appSubtitle");
+  if(titleEl) titleEl.textContent = UI[lang].title;
+  if(subEl) subEl.textContent = UI[lang].subtitle;
+
+  const lblProg = document.getElementById("lblProgress");
+  if(lblProg) lblProg.textContent = UI[lang].progress;
+
+  const lblQ = document.getElementById("lblQuestion");
+  if(lblQ) lblQ.textContent = UI[lang].question;
+
+  // Buttons
+  if(els.btnHelp) els.btnHelp.textContent = UI[lang].howItWorks;
+  if(els.btnReset) els.btnReset.textContent = UI[lang].reset;
+  if(els.btnList) els.btnList.textContent = UI[lang].list;
+  if(els.btnNext) els.btnNext.textContent = UI[lang].next;
+  if(els.btnSpeak) els.btnSpeak.title = UI[lang].pronounceTitle;
+
+  const explain = document.getElementById("lblLetterExplain");
+  if(explain) explain.innerHTML = UI[lang].letterExplain;
+
+  // Modal button
+  if(els.modalOk) els.modalOk.textContent = UI[lang].ok;
+
+  // If we are on a question, re-render current question (without advancing)
+  if(state && state.current){
+    // Keep answered state; just re-render prompt/labels
+    els.levelTitle.textContent = UI[lang].level(state.currentLevel);
+    if(!state.answered){
+      // rebuild current question fully for correct language
+      const cur = state.current;
+      clearAnswers();
+      setFeedback("");
+      setNextEnabled(false);
+      if(state.currentLevel===1) buildLevel1(cur);
+      else if(state.currentLevel===2) buildLevel2(cur);
+      else if(state.currentLevel===3) buildLevel3(cur);
+      else if(state.currentLevel===4) buildLevel4(cur);
+      else if(state.currentLevel===5) buildLevel5(cur);
+      else if(state.currentLevel===6) buildLevel6(cur);
+    } else {
+      // Only update question text/ hint
+      if(state.currentLevel===1) { els.questionText.textContent = state.current.inf; els.questionHint.textContent = UI[lang].hintL1; }
+      if(state.currentLevel===2) { els.questionText.textContent = meaningForLang(state.current); els.questionHint.textContent = UI[lang].hintL2; }
+      if(state.currentLevel===3) { els.questionText.textContent = meaningForLang(state.current); els.questionHint.textContent = UI[lang].hintL3; }
+      if(state.currentLevel===4) { els.questionHint.textContent = UI[lang].hintL4; }
+      if(state.currentLevel===5) { els.questionHint.textContent = UI[lang].hintL5; }
+      if(state.currentLevel===6) { els.questionHint.innerHTML = UI[lang].hintL6; }
+    }
+  } else {
+    els.levelTitle.textContent = "";
+    els.questionText.textContent = UI[lang].selectLevelToStart;
+    els.questionHint.textContent = "";
+  }
+  syncTopButtonsWidth();
+
+  syncTenseFiltersUI();
+  syncStudyControlsUI();
+  syncStarUI();
+  updateStatsUI();
+  try{ if(state && state.current) updateSpeakButton(state.current);
+  // FIX40: auto audio for question
+  try{ if(isAutoAudio() && els.btnSpeak && !els.btnSpeak.classList.contains('hidden')) els.btnSpeak.click(); }catch(e){} }catch(e){}
+}
+
+function syncTenseFiltersUI(){
+  // Only visible on level 3
+  const lvl = state.currentLevel;
+  if(!els.tenseFilters) return;
+  if(lvl===3){
+    els.tenseFilters.classList.remove("hidden");
+  }else{
+    els.tenseFilters.classList.add("hidden");
+  }
+
+  // labels (translated)
+  els.tenseInfLbl.textContent = UI[getLang()].tenseInf;
+  els.tensePastLbl.textContent = UI[getLang()].tensePast;
+  els.tensePPLbl.textContent = UI[getLang()].tensePP;
+
+  // sync checked states
+  const sel = state.tenseSel || {inf:true,past:false,pp:false};
+  els.tenseInf.checked = !!sel.inf;
+  els.tensePast.checked = !!sel.past;
+  els.tensePP.checked = !!sel.pp;
+}
+
+function syncStudyControlsUI(){
+  const lvl = state.currentLevel;
+  if(!els.studyControls) return;
+  if(lvl){
+    els.studyControls.classList.remove("hidden");
+    els.lblFavOnly.textContent = UI[getLang()].favOnly;
+    els.btnResetStars.textContent = UI[getLang()].resetStars;
+    els.chkFavOnly.checked = isFavOnly(lvl);
+    // enable reset button only if any question is unstarred (false stored)
+    const map = (state.stars && state.stars[lvl]) ? state.stars[lvl] : {};
+    const hasFalse = Object.values(map).some(v => v === false);
+    els.btnResetStars.disabled = !hasFalse;
+  } else {
+    els.studyControls.classList.add("hidden");
+  }
+}
+function syncStarUI(){
+  const lvl = state.currentLevel;
+  if(!els.btnStar) return;
+  if(!lvl || !state.currentKey){
+    els.btnStar.classList.add("hidden");
+    els.btnStar.setAttribute("aria-pressed","true");
+    els.btnStar.textContent = "⭐";
+    return;
+  }
+  els.btnStar.classList.remove("hidden");
+  const starred = isStarred(lvl, state.currentKey);
+  els.btnStar.setAttribute("aria-pressed", starred ? "true" : "false");
+  els.btnStar.textContent = starred ? "⭐" : "☆";
+}
+
+// tense filter listeners (level 3)
+(function initTenseFilters(){
+  if(!els.tenseChks || !els.tenseChks.length) return;
+  els.tenseChks.forEach(chk=>{
+    chk.addEventListener("change", ()=>{
+      // update state
+      const t = chk.dataset.tense;
+      state.tenseSel = state.tenseSel || {inf:true,past:false,pp:false}
+// FIX23: keep Level 3 speak hidden after language change
+try{ applyLevelMode(); }catch(e){};
+      state.tenseSel[t] = chk.checked;
+
+      // enforce at least one active (cannot leave all unchecked)
+      const any = Object.values(state.tenseSel).some(Boolean);
+      if(!any){
+        state.tenseSel.inf = true;
+        els.tenseInf.checked = true;
+      }
+
+      saveState();
+
+      // Level 3 behavior:
+      // - Changing filters must NOT change the current question unless it becomes invalid.
+      // - Enabling extra filters only expands the future pool.
+      if(state.currentLevel===3){
+        // refresh pool for future questions / totals
+        state.queue = buildQueueForLevel(3);
+        state.retries[3] = state.retries[3] || [];
+
+        const active = getActiveTenses();
+        const curTense = state.currentTense || "inf";
+        const hasCurrent = !!state.current;
+
+        // If current question's tense is still allowed, keep it
+        if(hasCurrent && active.includes(curTense)){
+          saveState();
+          updateStatsUI();
+          // keep current screen as-is
+          return;
+        }
+
+        // Otherwise, we must move to a valid question
+        if(hasCurrent){
+          state.current = null;
+          state.answered = false;
+        }
+        saveState();
+        nextQuestion();
+        return;
+      }
+
+      // other levels
+      updateStatsUI();
+    });});
+
+  // Study personalization (stars)
+  if(els.btnStar){
+    els.btnStar.addEventListener("click", ()=>{
+      const lvl = state.currentLevel;
+      if(!lvl || !state.currentKey) return;
+
+      const cur = isStarred(lvl, state.currentKey);
+
+      // Rule: you can only DISABLE ⭐ after answering that item correctly at least once.
+      // (Re-enabling is always allowed.)
+      if(cur === true){
+        const masteredObj = (state.progress && state.progress[lvl] && state.progress[lvl].mastered) ? state.progress[lvl].mastered : {};
+        const isMastered = !!masteredObj[state.currentKey];
+        if(!isMastered){
+          // small visual feedback (no modal noise)
+          els.btnStar.classList.add("shake");
+          setTimeout(()=>els.btnStar.classList.remove("shake"), 300);
+          return;
+        }
+      }
+
+      setStarred(lvl, state.currentKey, !cur);
+
+      // Auto-reset if none starred remains (always)
+      ensureStarsNotEmpty(lvl);
+      saveState();
+      syncStarUI();
+      syncStudyControlsUI();
+      // do NOT change the current question
+    });
+  }
+  if(els.chkFavOnly){
+    els.chkFavOnly.addEventListener("change", ()=>{
+      const lvl = state.currentLevel;
+      if(!lvl) return;
+      setFavOnly(lvl, els.chkFavOnly.checked);
+      saveState();
+      syncStudyControlsUI();
+      // Do not change current question (B:1). Only affects future pool.
+      if(lvl){
+        state.queue = buildQueueForLevel(lvl);
+        saveState();
+        updateStatsUI();
+      }
+    });
+  }
+  if(els.btnResetStars){
+    els.btnResetStars.addEventListener("click", ()=>{
+      const lvl = state.currentLevel;
+      if(!lvl) return;
+      resetAllStarsForLevel(lvl);
+      ensureStarsNotEmpty(lvl);
+      saveState();
+      syncStarUI();
+      syncStudyControlsUI();
+      // refresh pool for future
+      state.queue = buildQueueForLevel(lvl);
+      saveState();
+      updateStatsUI();
+    });
+  }
+
+})();
+
+
+
+let state = loadState();
+function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+function isStarred(lvl, key){
+  const map = (state.stars && state.stars[lvl]) ? state.stars[lvl] : {};
+  // default: starred (included)
+  return map[key] !== false;
+}
+function setStarred(lvl, key, val){
+  if(!state.stars) state.stars = initialState().stars;
+  if(!state.stars[lvl]) state.stars[lvl] = {};
+  state.stars[lvl][key] = !!val;
+}
+
+function countStarredInfs(lvl){
+  const all = allInfs();
+  let n = 0;
+  for(const inf of all){
+    if(isStarred(lvl, makeMasterKey(lvl, inf, "inf"))) n++;
+  }
+  return n;
+}
+function masteredFromStars(lvl){
+  const total = allInfs().length;
+  const remaining = countStarredInfs(lvl); // starred = pending
+  const mastered = Math.max(0, Math.min(total, total - remaining));
+  return { mastered, total, remaining };
+}
+function allQuestionKeysForLevel(lvl){
+  const keys = [];
+  const all = allInfs();
+  if(lvl===3){
+    const tensesAll = ["inf","past","pp"];
+    for(const inf of all){
+      for(const t of tensesAll){
+        keys.push(makeMasterKey(lvl, inf, t));
+      }
+    }
+    return keys;
+  }
+  for(const inf of all){
+    keys.push(makeMasterKey(lvl, inf, "inf"));
+  }
+  return keys;
+}
+function anyStarredInLevel(lvl){
+  const keys = allQuestionKeysForLevel(lvl);
+  for(const k of keys){
+    if(isStarred(lvl, k)) return true;
+  }
+  return false;
+}
+function resetAllStarsForLevel(lvl){
+  if(!state.stars) state.stars = initialState().stars;
+  state.stars[lvl] = {}; // empty means all true by default
+}
+function ensureStarsNotEmpty(lvl){
+  if(!anyStarredInLevel(lvl)){
+    resetAllStarsForLevel(lvl);
+  }
+}
+function isFavOnly(lvl){
+  return !!(state.favOnly && state.favOnly[lvl]);
+}
+function setFavOnly(lvl, val){
+  if(!state.favOnly) state.favOnly = initialState().favOnly;
+  state.favOnly[lvl] = !!val;
+}
+
+// FIX22: helper used by updateStatsUI (avoid ReferenceError)
+function getFavOnly(lvl){
+  return !!(state.favOnly && state.favOnly[lvl]);
+}
+
+
+function openModal(title, bodyHtml, opts={}) {
+  const o = Object.assign({ showOk: true, okLabel: UI[getLang()].ok }, opts);
+  els.modalTitle.textContent = title;
+  els.modalBody.innerHTML = bodyHtml;
+  els.modalOk.textContent = o.okLabel;
+  els.modalOk.style.display = o.showOk ? "" : "none";
+  els.modal.classList.remove("hidden");
+  els.modal.classList.add("flex");
+}
+function closeModal() {
+  els.modal.classList.add("hidden");
+  els.modal.classList.remove("flex");
+}
+els.modalClose.addEventListener("click", closeModal);
+els.modalOk.addEventListener("click", closeModal);
+els.modal.addEventListener("click", (e)=>{ if(e.target === els.modal) closeModal(); });
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i=a.length-1;i>0;i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function uniq(arr){ return Array.from(new Set(arr)); }
+function pct(n,d){ if(d<=0) return 0; return Math.round((n/d)*100); }
+function allInfs(){ return DEFAULT_VERBS.map(v=>v.inf); }
+function getVerb(inf){ return DEFAULT_VERBS.find(v=>v.inf===inf); }
+
+function getActiveTenses(){
+  if(state.currentLevel!==3) return ["inf"];
+  const sel = state.tenseSel || {inf:true,past:false,pp:false};
+  const t = [];
+  if(sel.inf) t.push("inf");
+  if(sel.past) t.push("past");
+  if(sel.pp) t.push("pp");
+  return t.length ? t : ["inf"];
+}
+function tenseLabel(t){
+  const u = UI[getLang()];
+  if(t==="past") return u.tensePast;
+  if(t==="pp") return u.tensePP;
+  return u.tenseInf;
+}
+function makeMasterKey(lvl, inf, tense){
+  return (lvl===3) ? `${inf}|${tense}` : inf;
+}
+function parseQueueItem(lvl, item){
+  if(lvl===3){
+    const parts = String(item).split("|");
+    return { inf: parts[0], tense: parts[1] || "inf" };
+  }
+  return { inf: String(item), tense: "inf" };
+}
+function getLevelTotal(lvl){
+  if(lvl===3){
+    return DEFAULT_VERBS.length * getActiveTenses().length;
+  }
+  return DEFAULT_VERBS.length;
+}
+// Total of questions in the current practice pool (respects ⭐ filter per level and active tenses for L3)
+function getPracticeTotal(lvl){
+  if(!lvl) return 0;
+  ensureStarsNotEmpty(lvl);
+  const favOnly = isFavOnly(lvl);
+  const all = allInfs();
+  if(lvl===3){
+    const tenses = getActiveTenses();
+    if(!favOnly) return DEFAULT_VERBS.length * tenses.length;
+    let c = 0;
+    for(const inf of all){
+      for(const t of tenses){
+        const k = makeMasterKey(lvl, inf, t);
+        if(isStarred(lvl, k)) c++;
+      }
+    }
+    return c;
+  }
+  if(!favOnly) return DEFAULT_VERBS.length;
+  let c = 0;
+  for(const inf of all){
+    const k = makeMasterKey(lvl, inf, "inf");
+    if(isStarred(lvl, k)) c++;
+  }
+  return c;
+}
+function countMastered(lvl){
+  const masteredObj = state.progress[lvl].mastered || {};
+  if(lvl!==3) return Object.keys(masteredObj).length;
+  const act = new Set(getActiveTenses());
+  return Object.keys(masteredObj).filter(k=>{
+    const p = k.split("|");
+    return p.length===2 && act.has(p[1]);
+  }).length;
+}
+
+function isLevelUnlocked(lvl){
+  return true; // tots els nivells disponibles
+}
+function updateLevelButtons(){
+  els.levelBtns().forEach(btn=>{
+    const lvl = parseInt(btn.dataset.level,10);
+    btn.classList.remove("btn-disabled");
+    btn.classList.toggle("level-active", state.currentLevel===lvl);
+    btn.innerHTML = `N${lvl}`;
+  });
+}
+function updateStatsUI(){
+  const lvl = state.currentLevel;
+
+  // --- No-level empty state layout ---
+  if(!lvl){
+    if(els.quizHeaderGrid) els.quizHeaderGrid.classList.add('noLevel');
+    if(els.levelHeaderLeft) els.levelHeaderLeft.classList.add('hidden');
+    if(els.btnSpeak) els.btnSpeak.classList.add('hidden');
+    if(els.quizFooter) els.quizFooter.classList.add('hidden');
+    if(els.progressSection) els.progressSection.classList.add('hidden');
+  } else {
+    if(els.quizHeaderGrid) els.quizHeaderGrid.classList.remove('noLevel');
+    if(els.levelHeaderLeft) els.levelHeaderLeft.classList.remove('hidden');
+    if(els.btnSpeak) els.btnSpeak.classList.remove('hidden');
+    if(els.quizFooter) els.quizFooter.classList.remove('hidden');
+    if(els.progressSection) els.progressSection.classList.remove('hidden');
+  }
+
+  // qTotal (footer) can respect ⭐ filter (practice set).
+  const practiceTotal = getPracticeTotal(lvl||1) || allInfs().length;
+
+  // FIX21:
+  // - If "Només ⭐" is ON: progress/mastered is based on ⭐ remaining (unstarred = already known).
+  // - If "Només ⭐" is OFF: progress/mastered is based ONLY on correct answers in this level run (state.progress[lvl].mastered).
+  const total = allInfs().length;
+  const favOn = !!(lvl && getFavOnly(lvl));
+  const mt = favOn ? masteredFromStars(lvl||1) : null;
+
+  // keep question total in sync (especially for level 3 with tense filters)
+  if(lvl && els.qTotal) els.qTotal.textContent = practiceTotal;
+
+  if(!lvl){
+    // cap nivell seleccionat encara
+    els.progressBar.style.width = `0%`;
+    els.progressPct.textContent = `0%`;
+    els.scoreLine.textContent = UI[getLang()].correctWrong(0,0);
+    els.masterLine.textContent = UI[getLang()].masteredLine(0, total);
+        if(els.btnReset) els.btnReset.disabled = true;
+    updateLevelButtons();
+    return;
+  }
+
+  const mastered = favOn ? mt.mastered : Math.max(0, Math.min(total, Object.keys((state.progress[lvl] && state.progress[lvl].mastered) || {}).length));
+  const p = pct(mastered, total);
+  els.progressBar.style.width = `${p}%`;
+  els.progressPct.textContent = `${p}%`;
+  els.scoreLine.textContent = UI[getLang()].correctWrong(state.progress[lvl].correct, state.progress[lvl].wrong);
+  els.masterLine.textContent = UI[getLang()].masteredLine(mastered, total);
+  // Si nivell completat, mostra modal amb opcions (una sola vegada)
+  if(mastered >= total){
+    els.btnNext.disabled = true;
+    // fixa comptador de pregunta a total
+    state.qPos[lvl] = total;
+    els.qIndex.textContent = total;
+    if(!state.levelCompleteShown[lvl]){
+      state.levelCompleteShown[lvl] = true;
+      saveState();
+      openModal(UI[getLang()].levelCompleteTitle, `
+        <p>${UI[getLang()].levelCompleteBody(lvl)}</p>
+        <div class="mt-4 flex gap-2 justify-end">
+          <button id="btnResetLevelFromComplete" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 transition">${UI[getLang()].resetThisLevelBtn}</button>
+          <button id="btnNextLevelFromComplete" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">${UI[getLang()].nextLevelBtn}</button>
+        </div>
+      `, { showOk: false });
+      setTimeout(()=>{
+        const a=document.getElementById("btnResetLevelFromComplete");
+        const b=document.getElementById("btnNextLevelFromComplete");
+        if(a) a.onclick = ()=>{
+          // reinicia nivell actual
+          state.progress[lvl] = { mastered: {}, correct: 0, wrong: 0 };
+          state.retries[lvl] = [];
+          state.queue = [];
+          state.current = null;
+          state.answered = false;
+          state.qPos[lvl] = 0;
+          state.levelCompleteShown[lvl] = false;
+          saveState();
+          closeModal();
+          startLevel(lvl);
+          updateStatsUI();
+        };
+        if(b) b.onclick = ()=>{
+          const next = Math.min(lvl + 1, 6);
+          closeModal();
+          startLevel(next);
+        };
+      },0);
+    }
+  } else {
+    state.levelCompleteShown[lvl] = false;
+  }
+
+  // habilita/deshabilita "Reinicia" només si hi ha progrés en aquest nivell
+  const prog = state.progress[lvl];
+  const hasAny = (prog.correct > 0) || (prog.wrong > 0) || (prog.mastered && Object.keys(prog.mastered).length > 0);
+  if(els.btnReset) els.btnReset.disabled = !hasAny;
+  updateLevelButtons();
+}
+
+function setFeedback(html, ok=true){
+  els.feedback.innerHTML = html || "";
+  els.feedback.className = "text-base font-bold text-center " + (ok ? "text-green-600" : "text-red-600");
+}
+function clearAnswers(){
+  els.answers.innerHTML = "";
+  els.level6Area.classList.add("hidden");
+  els.level3Letters.classList.add("hidden");
+}
+function setNextEnabled(enabled){
+  els.btnNext.disabled = !enabled;
+  if(enabled){
+    els.btnNext.classList.remove("bg-blue-300","hover:bg-blue-300");
+    els.btnNext.classList.add("bg-blue-500","hover:bg-blue-600");
+  } else {
+    els.btnNext.classList.add("bg-blue-300","hover:bg-blue-300");
+    els.btnNext.classList.remove("bg-blue-500","hover:bg-blue-600");
+  }
+}
+function wiggle(){
+  els.quizArea.classList.remove("shake");
+  void els.quizArea.offsetWidth;
+  els.quizArea.classList.add("shake");
+}
+
+
+/* Pronunciació (Web Speech API) */
+function canSpeak(){
+  return ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
+}
+
+function isAutoAudio(){
+  return (state.audioMode || 'auto') === 'auto';
+}
+// Speak multiple texts sequentially (skips falsy)
+function speakSequence(texts){
+  const arr = (texts||[]).map(t=> (t||"").trim()).filter(Boolean);
+  if(!arr.length) return;
+  // If only one item, use speakEN for maximum compatibility
+  if(arr.length===1){ speakEN(arr[0]); return; }
+
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+
+  let i = 0;
+  const v = getVoice();
+  const lang = (v && v.lang) ? v.lang : 'en-US';
+
+  const speakNext = ()=>{
+    if(i>=arr.length) return;
+    const u = new SpeechSynthesisUtterance(arr[i++]);
+    if(v) u.voice = v;
+    u.lang = lang;
+    u.rate = 0.95;
+    u.onend = ()=> setTimeout(speakNext, 120);
+    u.onerror = ()=> setTimeout(speakNext, 120);
+    try{ window.speechSynthesis.speak(u); }catch(e){}
+  };
+  speakNext();
+}
+function speakEN(text){
+  try{
+    if(!canSpeak()) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    // Try to prefer English voice if available
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    const enVoice = voices.find(v=> (v.lang||"").toLowerCase().startsWith("en"));
+    if(enVoice) u.voice = enVoice;
+    u.lang = (enVoice && enVoice.lang) ? enVoice.lang : "en-US";
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+  } catch(e){}
+
+// FIX35: speak the tense asked in the QUESTION (dynamic at click time to avoid stale handlers)
+function speakQuestionTense(){
+  try{
+    const v = state.current;
+    const lvl = state.currentLevel;
+    if(!v) return;
+    let t = null;
+    if(lvl===1) t = v.inf;
+    else if(lvl===4) t = v.past;
+    else if(lvl===5) t = v.pp;
+    if(t) speakEN(t);
+  }catch(e){}
+}
+
+// FIX49: Speak a sequence without cancelling between items (for N6 auto audio)
+function speakQueue(texts){
+  const arr = (texts||[]).map(t=>(t||"").trim()).filter(Boolean);
+  if(!arr.length) return;
+  if(arr.length===1){ speakEN(arr[0]); return; }
+
+  const v = getVoice();
+  const lang = (v && v.lang) ? v.lang : 'en-US';
+
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+
+  // Let the browser queue utterances naturally (more reliable than manual chaining in some engines)
+  for(const t of arr){
+    try{
+      const u = new SpeechSynthesisUtterance(t);
+      if(v) u.voice = v;
+      u.lang = lang;
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+}
+}
+
+// FIX24: small audio button for correct answers
+function createInlineAudioBtn(text){
+  const s=document.createElement('span');
+  s.className='inlineAudio ml-2 inline-flex items-center justify-center rounded px-2 py-1 text-sm bg-slate-200 hover:bg-slate-300 cursor-pointer select-none';
+  s.title=(UI[getLang()] && UI[getLang()].pronounceTitle) ? UI[getLang()].pronounceTitle : 'Pronounce';
+  s.textContent='🔊';
+  s.addEventListener('click', (ev)=>{ ev.stopPropagation(); speakEN(text); });
+  return s;
+}
+function updateSpeakButton(v){
+  // FIX39: The QUESTION shows the infinitive (N1, N4, N5). It must always pronounce the infinitive.
+  // Answers (N4/N5) have their own audio next to the correct option (past / pp).
+  const lvl = state.currentLevel;
+  if(!els.btnSpeak) return;
+
+  const show = !!(v && v.inf) && canSpeak() && (lvl===1 || lvl===4 || lvl===5);
+
+  els.btnSpeak.classList.toggle("hidden", !show);
+  els.btnSpeak.style.display = show ? "" : "none";
+  els.btnSpeak.disabled = !show;
+
+  if(show){
+    els.btnSpeak.onclick = ()=>{
+      try{
+        const cur = state.current;
+        if(cur && cur.inf) speakEN(cur.inf);
+      }catch(e){}
+    };
+  } else {
+    els.btnSpeak.onclick = null;
+  }
+}
+// Some browsers load voices async
+if("speechSynthesis" in window){
+  window.speechSynthesis.onvoiceschanged = ()=> {
+    if(state.current && state.currentLevel===1) updateSpeakButton(state.current);
+  // FIX40: auto audio for question
+  try{ if(isAutoAudio() && els.btnSpeak && !els.btnSpeak.classList.contains('hidden')) els.btnSpeak.click(); }catch(e){}
+  };
+
+
+  // --- UI helpers: no-level mode + fixed side buttons width ---
+  function setNoLevelMode(isNoLevel){
+    try{ els.quizArea.classList.toggle("no-level", isNoLevel);}catch(e){}
+    if(!els.levelHeaderLeft || !els.quizFooter || !els.progressSection) return;
+    try{ els.quizArea.classList.toggle('no-level', isNoLevel);}catch(e){}
+    els.levelHeaderLeft.classList.toggle("hidden", isNoLevel);
+    els.quizFooter.classList.toggle("hidden", isNoLevel);
+    els.progressSection.classList.toggle("hidden", isNoLevel);
+    if(els.questionHint) els.questionHint.classList.toggle("hidden", isNoLevel);
+
+    // When no level selected, ensure the main text is the placeholder and disable next
+    if(isNoLevel){
+      if(els.btnNext) els.btnNext.disabled = true;
+      if(els.qCurrent) els.qCurrent.textContent = "—";
+      if(els.qTotal) els.qTotal.textContent = "—";
+    }
+  }
+
+  function applyFixedSideButtonWidth(){
+    try{
+      const tmp = document.createElement("span");
+      tmp.textContent = "ინსტრუქციები"; // Georgian longest label
+      tmp.style.position = "absolute";
+      tmp.style.visibility = "hidden";
+      tmp.style.whiteSpace = "nowrap";
+      // match button typography roughly
+      tmp.style.fontSize = "12px";
+      tmp.style.fontWeight = "700";
+      tmp.style.fontFamily = getComputedStyle(document.body).fontFamily;
+      document.body.appendChild(tmp);
+      const w = tmp.getBoundingClientRect().width;
+      document.body.removeChild(tmp);
+      // add horizontal padding (px-2 = 8px*2) + a little breathing room
+      const finalW = Math.ceil(w + 32);
+      document.documentElement.style.setProperty("--sideBtnW", finalW + "px");
+    }catch(e){}
+  }
+}
+
+/* similarity helpers */
+function levenshtein(a,b){
+  a=String(a); b=String(b);
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},()=>Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0]=i;
+  for(let j=0;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      const cost=a[i-1]===b[j-1]?0:1;
+      dp[i][j]=Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost);
+    }
+  }
+  return dp[m][n];
+}
+
+/* Genera variants "creïbles" (typos) per fer més difícil quan el verb és igual en tots els temps */
+function isVowel(ch){ return "aeiou".includes((ch||"").toLowerCase()); }
+function typoVariants(word){
+  word = String(word||"").trim();
+  if(word.length < 3) return [];
+  const vars = new Set();
+
+  // 1) canviar una vocal per una altra (sproad, spreat, etc.)
+  const vowels = ["a","e","i","o","u"];
+  for(let i=0;i<word.length;i++){
+    const ch = word[i].toLowerCase();
+    if(isVowel(ch)){
+      for(const v of vowels){
+        if(v===ch) continue;
+        vars.add(word.slice(0,i) + v + word.slice(i+1));
+      }
+    }
+  }
+
+  // 2) intercanviar dues lletres adjacents (raed)
+  for(let i=0;i<word.length-1;i++){
+    if(word[i] !== word[i+1]){
+      vars.add(word.slice(0,i) + word[i+1] + word[i] + word.slice(i+2));
+    }
+  }
+
+  // 3) afegir/eliminar una lletra comuna al final (spreads, spreadd) - poc, però útil
+  vars.add(word + "s");
+  if(word.length>3) vars.add(word.slice(0,-1));
+
+  // Filtre: només variants amb distància petita
+  const out = Array.from(vars).filter(v=>{
+    const d = levenshtein(word, v);
+    return d>=1 && d<=2;
+  });
+
+  // Prioritza variants amb canvi de vocal o swap (més creïbles)
+  return shuffle(out).slice(0, 10);
+}
+
+/* Escull distractors molt semblants; si no n'hi ha prou, crea typos */
+function hardDistractors(correct, pool, k){
+  const scored = pool
+    .filter(x=>x!==correct)
+    .map(x=>({x, d: levenshtein(correct, x)}))
+    .sort((a,b)=>a.d-b.d);
+
+  const chosen = [];
+  for(const o of scored){
+    if(o.d <= 2) { // només molt semblants
+      if(!chosen.includes(o.x)) chosen.push(o.x);
+      if(chosen.length>=k) break;
+    }
+  }
+
+  if(chosen.length < k){
+    const typos = typoVariants(correct);
+    for(const t of typos){
+      if(chosen.length>=k) break;
+      if(t!==correct && !chosen.includes(t)) chosen.push(t);
+    }
+  }
+
+  // Si encara falten, omple amb les més semblants disponibles
+  if(chosen.length < k){
+    for(const o of scored){
+      if(chosen.length>=k) break;
+      if(!chosen.includes(o.x) && o.x!==correct) chosen.push(o.x);
+    }
+  }
+
+  return chosen.slice(0,k);
+}
+function similarDistractors(correctForm, poolForms, k=2){
+  const scored = poolForms
+    .filter(x=>x!==correctForm)
+    .map(x=>({x, d: levenshtein(correctForm, x)}))
+    .sort((a,b)=>a.d-b.d);
+  const best = scored.slice(0, 30).map(o=>o.x);
+  const chosen=[];
+  for(const x of best){
+    if(chosen.length>=k) break;
+    if(!chosen.includes(x) && x!==correctForm) chosen.push(x);
+  }
+  if(chosen.length<k){
+    const rest = shuffle(poolForms.filter(x=>x!==correctForm && !chosen.includes(x)));
+    while(chosen.length<k && rest.length) chosen.push(rest.pop());
+  }
+  return chosen;
+}
+function uniquePush(arr, v){
+  if(v && !arr.includes(v)) arr.push(v);
+}
+
+/* per-verb tricky options */
+function makeLevel3Options(v){
+  const correct = v.past;
+  const opts = [correct];
+
+  // pot sortir infinitiu o participi si són diferents
+  if(v.inf !== correct) uniquePush(opts, v.inf);
+  if(v.pp !== correct) uniquePush(opts, v.pp);
+
+  // distractors difícils: primer molt semblants (o typos si cal)
+  const pool = uniq(DEFAULT_VERBS.map(x=>x.past));
+  const need = Math.max(0, 3 - opts.length);
+  const extras = hardDistractors(correct, pool, need + 2); // en demanem una mica més per variar
+  for(const x of extras){
+    if(opts.length>=3) break;
+    uniquePush(opts, x);
+  }
+
+  // assegura 3 opcions
+  while(opts.length<3){
+    uniquePush(opts, hardDistractors(correct, pool, 1)[0] || pool[Math.floor(Math.random()*pool.length)]);
+  }
+
+  return { options: shuffle(opts).slice(0,3), correct, extrasUsed: opts.filter(x=>x!==correct) };
+}
+function makeLevel4Options(v){
+  const correct = v.pp;
+  const opts = [correct];
+
+  // pot sortir infinitiu o past simple si són diferents
+  if(v.inf !== correct) uniquePush(opts, v.inf);
+  if(v.past !== correct) uniquePush(opts, v.past);
+
+  const pool = uniq(DEFAULT_VERBS.map(x=>x.pp));
+  const need = Math.max(0, 3 - opts.length);
+  const extras = hardDistractors(correct, pool, need + 2);
+  for(const x of extras){
+    if(opts.length>=3) break;
+    uniquePush(opts, x);
+  }
+
+  while(opts.length<3){
+    uniquePush(opts, hardDistractors(correct, pool, 1)[0] || pool[Math.floor(Math.random()*pool.length)]);
+  }
+
+  return { options: shuffle(opts).slice(0,3), correct, extrasUsed: opts.filter(x=>x!==correct) };
+}
+function makeLevel5Pool(v){
+  const base = [];
+  uniquePush(base, v.inf);
+  uniquePush(base, v.past);
+  uniquePush(base, v.pp);
+
+  const l3 = makeLevel3Options(v).extrasUsed;
+  const l4 = makeLevel4Options(v).extrasUsed;
+  const tricky = shuffle(uniq(l3.concat(l4))).filter(x=>!base.includes(x));
+
+  for(const x of tricky){
+    if(base.length>=5) break;
+    uniquePush(base, x);
+  }
+  const pool = uniq(DEFAULT_VERBS.map(x=>x.past).concat(DEFAULT_VERBS.map(x=>x.pp)).concat(allInfs()));
+  const extra = shuffle(pool).filter(x=>!base.includes(x));
+  while(base.length<5 && extra.length){
+    uniquePush(base, extra.pop());
+  }
+  return base.slice(0,5);
+}
+
+/* Wrong answers return at end (shuffled) */
+function addRetry(item){
+  const lvl = state.currentLevel;
+  const list = state.retries[lvl] || [];
+  if(!list.includes(item)) list.push(item);
+  state.retries[lvl] = list;
+}
+
+function renderMCQ(options, correct, onCorrect){
+  // FIX34: Keep original option button design (optBtn) for N1,
+  // and for N2/N4/N5 show an adjacent audio button (not nested) that activates only for the correct option after answering.
+  els.level6Area.classList.add("hidden");
+  els.level3Letters.classList.add("hidden");
+  els.answers.innerHTML = "";
+
+  // always shuffle options positions
+  options = shuffle(options);
+
+  const lvl = state.currentLevel;
+  const audioOnOptions = (lvl===2 || lvl===4 || lvl===5);
+
+  // reset answered flag per question
+  state.answered = false;
+
+  const rows = [];
+
+  function makeAudioIcon(word){
+    const a = document.createElement("button");
+    a.type = "button";
+    a.className = "optAudio iconBtn";
+    a.textContent = "🔊";
+    a.title = (UI[getLang()] && UI[getLang()].pronounceTitle) ? UI[getLang()].pronounceTitle : "Pronounce";
+    a.disabled = true;
+    a.addEventListener("click", (ev)=>{
+      ev.stopPropagation();
+      if(a.disabled) return;
+      speakEN(word);
+    });
+    return a;
+  }
+
+  function enableAudioForCorrect(){
+    if(!audioOnOptions) return;
+    rows.forEach(r=>{
+      const isCorrect = (r.opt === correct);
+      r.audioBtn.disabled = !isCorrect;
+      r.audioBtn.classList.toggle("optAudioOn", isCorrect);
+    });
+  }
+
+  options.forEach((opt)=>{
+    // original button design
+    const btn=document.createElement("button");
+    btn.className="optBtn bg-white border border-slate-200 rounded-xl px-4 py-3 text-left";
+    btn.textContent = opt;
+
+    let audioBtn = null;
+    if(audioOnOptions){
+      const row = document.createElement("div");
+      row.className = "optRow";
+      audioBtn = makeAudioIcon(opt);
+      row.appendChild(btn);
+      row.appendChild(audioBtn);
+      els.answers.appendChild(row);
+      rows.push({btn, audioBtn, opt});
+    } else {
+      els.answers.appendChild(btn);
+    }
+
+    btn.addEventListener("click", ()=>{
+      if(state.answered) return;
+      state.answered = true;
+
+      const buttons = Array.from(els.answers.querySelectorAll("button.optBtn"));
+      buttons.forEach(b=>{
+        b.disabled = true;
+        b.classList.add("optLocked");
+      });
+
+      const ok = (opt === correct);
+      if(ok){
+        btn.classList.add("optCorrect");
+        setFeedback(UI[getLang()].good, true);
+        state.progress[state.currentLevel].correct += 1;
+        onCorrect?.();
+      } else {
+        btn.classList.add("optWrong");
+        const correctBtn = buttons.find(b=>b.textContent===correct);
+        if(correctBtn) correctBtn.classList.add("optReveal");
+        setFeedback(UI[getLang()].notCorrect, false);
+        state.progress[state.currentLevel].wrong += 1;
+        addRetry(state.currentKey || state.current.inf);
+        wiggle();
+      }
+
+      // enable audio only for correct option after answering
+      try{ if(canSpeak()) enableAudioForCorrect(); }catch(e){}
+      // FIX40: auto audio for correct answer (MCQ levels)
+      try{ if(isAutoAudio() && audioOnOptions && canSpeak()) speakEN(correct); }catch(e){}
+
+      saveState();
+      updateStatsUI();
+      setNextEnabled(true);
+    });
+  });
+
+  setNextEnabled(false);
+}
+
+function maybeFinishLevel(){
+  const lvl = state.currentLevel;
+  if(countMastered(lvl) >= DEFAULT_VERBS.length){
+    if(lvl < 6){
+      openModal(
+        UI[getLang()].lvlCompleted(lvl),
+        UI[getLang()].lvlCompletedBody(lvl),
+        { showOk: false }
+      );
+      setTimeout(()=>{
+        const r=document.getElementById("btnResetAfterComplete");
+        if(r) r.onclick = ()=>{
+          // Reinicia NOMÉS aquest nivell i torna a començar
+          state.progress[lvl] = { mastered: {}, correct: 0, wrong: 0 };
+          state.retries[lvl] = [];
+          state.queue = [];
+          state.current = null;
+          state.answered = false;
+          saveState();
+          closeModal();
+          startLevel(lvl);
+          updateStatsUI();
+        };
+
+        const n=document.getElementById("btnNextLevel");
+        if(n) n.onclick = ()=>{
+          closeModal();
+          startLevel(lvl+1);
+        };
+      },0);
+    } else {
+      openModal(UI[getLang()].gameDoneTitle, UI[getLang()].gameDoneBody);
+    }
+  }
+}
+
+function buildQueueForLevel(lvl){
+  const all = allInfs();
+  const masteredSet = state.progress[lvl].mastered || {};
+  // Ensure stars not empty (auto reset if needed)
+  ensureStarsNotEmpty(lvl);
+  const favOnly = isFavOnly(lvl);
+
+  if(lvl===3){
+    const tenses = getActiveTenses(); // only active tenses used for practice pool
+    const allItems = [];
+    for(const inf of all){
+      for(const t of tenses){
+        const qKey = makeMasterKey(lvl, inf, t);
+        if(!favOnly || isStarred(lvl, qKey)){
+          allItems.push(`${inf}|${t}`);
+        }
+      }
+    }
+    // If favOnly removed everything (e.g. stars empty for active tenses), fall back to all active items
+    const safeAll = allItems.length ? allItems : (()=> {
+      const fallback = [];
+      for(const inf of all){
+        for(const t of tenses){
+          fallback.push(`${inf}|${t}`);
+        }
+      }
+      return fallback;
+    })();
+
+    const notMastered = safeAll.filter(k=>!masteredSet[k]);
+    const mastered = safeAll.filter(k=>!!masteredSet[k]);
+    const pool = shuffle(notMastered.concat(shuffle(mastered).slice(0, Math.min(20, mastered.length))));
+    return pool.length ? pool : shuffle(safeAll);
+  }
+
+  const safeAll = favOnly ? all.filter(inf=>isStarred(lvl, makeMasterKey(lvl, inf, "inf"))) : all;
+  const notMastered = safeAll.filter(inf=>!masteredSet[inf]);
+  const mastered = safeAll.filter(inf=>!!masteredSet[inf]);
+  const pool = shuffle(notMastered.concat(shuffle(mastered).slice(0, Math.min(10, mastered.length))));
+  return pool.length ? pool : shuffle(safeAll.length ? safeAll : all);
+}
+
+
+function takeNextItem(){
+  const lvl = state.currentLevel;
+  if(state.queue.length) return state.queue.shift();
+
+  const r = state.retries[lvl] || [];
+  if(r.length){
+    state.queue = shuffle(r);
+    state.retries[lvl] = [];
+    saveState();
+    return state.queue.shift();
+  }
+  state.queue = buildQueueForLevel(lvl);
+  return state.queue.shift();
+}
+
+function nextQuestion(){
+  const lvl = state.currentLevel;
+  const item = takeNextItem();
+  const parsed = parseQueueItem(lvl, item);
+  const inf = parsed.inf;
+  const tense = parsed.tense;
+  const v = getVerb(inf);
+
+  state.current = v;
+  state.currentTense = (lvl===3)? tense : 'inf';
+  state.currentKey = makeMasterKey(lvl, inf, (lvl===3)?tense:'inf');
+  state.answered = false;
+
+  updateSpeakButton(v);
+  syncStarUI();
+  syncStudyControlsUI();
+
+  clearAnswers();
+  setFeedback("");
+  setNextEnabled(false);
+
+  els.levelTitle.textContent = UI[getLang()].level(lvl);
+  const totalForLvl = getPracticeTotal(lvl) || getLevelTotal(lvl);
+  els.qTotal.textContent = totalForLvl;
+  state.qPos[lvl] = Math.min((state.qPos[lvl]||0) + 1, totalForLvl);
+  els.qIndex.textContent = state.qPos[lvl];
+
+  if(lvl===1) return buildLevel1(v);
+  if(lvl===2) return buildLevel2(v);
+  if(lvl===3) return buildLevel3(v);
+  if(lvl===4) return buildLevel4(v);
+  if(lvl===5) return buildLevel5(v);
+  if(lvl===6) return buildLevel6(v);
+}
+
+function buildLevel1(v){
+  els.questionText.textContent = v.inf;
+  els.questionHint.textContent = UI[getLang()].hintL1;
+  const pool = DEFAULT_VERBS.map(x=>meaningForLang(x));
+  const correct = meaningForLang(v);
+  const options = [correct, ...shuffle(pool.filter(x=>x!==correct)).slice(0,2)];
+  renderMCQ(options, correct, ()=>{ state.progress[1].mastered[v.inf]=true; saveState(); updateStatsUI(); });
+}
+function buildLevel2(v){
+  els.questionText.textContent = meaningForLang(v);
+  els.questionHint.textContent = UI[getLang()].hintL2;
+  const pool = allInfs();
+  const correct = v.inf;
+  const options = [correct, ...shuffle(pool.filter(x=>x!==correct)).slice(0,2)];
+  renderMCQ(options, correct, ()=>{ state.progress[2].mastered[v.inf]=true; saveState(); updateStatsUI(); });
+}
+function buildLevel3(v){
+  // Verb en català -> completa el verb en anglès amb lletres
+  const t = state.currentTense || "inf";
+  // Question text: show meaning + small tense label
+  const qBase = (meaningForLang(v) || v.inf);
+  els.questionText.innerHTML = "";
+  els.questionText.appendChild(document.createTextNode(qBase + " "));
+  const tSpan = document.createElement("span");
+  tSpan.className = "tenseSmall";
+  tSpan.textContent = "(" + tenseLabel(t) + ")";
+  els.questionText.appendChild(tSpan);
+  els.questionHint.textContent = UI[getLang()].hintL3;
+
+  els.level3Letters.classList.remove("hidden");
+  els.level6Area.classList.add("hidden");
+  els.answers.innerHTML = "";
+
+  const tForm = (t==="past") ? (v.past || v.past_raw || v.inf) : (t==="pp") ? (v.pp || v.pp_raw || v.inf) : (v.inf || "");
+  const target = String(tForm).split("/")[0].trim().toLowerCase();
+  const letters = target.split("");
+  // Track whether user made any mistake in this word
+  state.l3HadMistake = false;
+  // Help (hint) & audio buttons
+  const baseLen = letters.filter(ch=>ch !== "-").length;
+  let maxHints;
+  if(baseLen <= 3) maxHints = 1;
+  else if(baseLen <= 5) maxHints = 2;
+  else if(baseLen <= 7) maxHints = 3;
+  else maxHints = Math.max(3, Math.floor((2 * baseLen) / 3));
+  maxHints = Math.max(1, Math.min(baseLen - 1, maxHints));
+  state.l3HintsUsed = 0;
+  if(els.btnL3Audio){
+    els.btnL3Audio.disabled = true;
+    els.btnL3Audio.onclick = ()=> speakEN(target);
+  }
+  if(els.btnL3Help){
+    els.btnL3Help.disabled = (maxHints <= 0);
+    els.btnL3Help.onclick = ()=> {
+      if(maxHints <= 0) return;
+      if(state.l3HintsUsed >= maxHints) { els.btnL3Help.disabled = true; return; }
+      // Pick a random empty slot (non-hyphen)
+      const empties = [];
+      for(let i=0;i<letters.length;i++){
+        if(letters[i]==="-") continue;
+        if(slotEls[i].textContent==="") empties.push(i);
+      }
+      if(!empties.length){ els.btnL3Help.disabled = true; return; }
+      const pick = empties[Math.floor(Math.random()*empties.length)];
+      const correctCh = letters[pick];
+      slotEls[pick].textContent = correctCh.toUpperCase();
+      state.l3HintsUsed += 1;
+      if(state.l3HintsUsed >= maxHints) els.btnL3Help.disabled = true;
+
+      // Disable one matching letter button from the bank (if any remains enabled)
+      const btns = Array.from(els.letterBank.querySelectorAll("button"));
+      const matchBtn = btns.find(b=> !b.disabled && (b.textContent||"").toLowerCase()===correctCh);
+      if(matchBtn){ matchBtn.disabled = true; matchBtn.style.opacity = "0.4"; }
+
+      // If now complete, finish word
+      const remaining = slotEls.some((s,i)=> letters[i] !== "-" && s.textContent==="");
+      if(!remaining){
+        complete();
+      }
+    };
+  }
+
+  els.letterSlots.innerHTML = "";
+  els.letterBank.innerHTML = "";
+
+  let idx = 0;
+  const slotEls = [];
+
+  // crea slots
+  letters.forEach(ch=>{
+    const slot = document.createElement("div");
+    slot.className = "w-9 h-10 rounded-lg border bg-slate-50 flex items-center justify-center text-lg font-bold";
+    slot.textContent = (ch === "-") ? "-" : "";
+    slotEls.push(slot);
+    els.letterSlots.appendChild(slot);
+  });
+
+  // pool de lletres: lletres del verb + extres
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+  const base = letters.filter(ch=>ch !== "-");
+  const extraCount = Math.max(6, Math.min(12, base.length));
+  const extras = Array.from({length: extraCount}, ()=> alphabet[Math.floor(Math.random()*alphabet.length)]);
+  const pool = shuffle(base.concat(extras));
+
+  function advanceHyphens(){
+    while(idx < letters.length && letters[idx] === "-"){
+      slotEls[idx].textContent = "-";
+      idx++;
+    }
+  }
+  function complete(){
+    const key = state.currentKey || makeMasterKey(3, v.inf, state.currentTense || "inf");
+    if(!state.progress[3].mastered[key]){
+      // Count per WORD (not per letter): correct only if no mistakes
+      if(state.l3HadMistake){
+        state.progress[3].wrong += 1;
+        setFeedback(UI[getLang()].bad, true);
+      } else {
+        state.progress[3].correct += 1;
+        setFeedback(UI[getLang()].good, true);
+      }
+      state.progress[3].mastered[key] = true;
+    } else {
+      // Already mastered: just show feedback
+      setFeedback(state.l3HadMistake ? UI[getLang()].bad : UI[getLang()].good, true);
+    }
+    // Enable audio once completed, disable help
+    if(els.btnL3Audio) els.btnL3Audio.disabled = false;
+    if(els.btnL3Help) els.btnL3Help.disabled = true;
+
+    saveState(); updateStatsUI();
+    setNextEnabled(true);
+    maybeFinishLevel();
+  }
+
+  advanceHyphens();
+
+  pool.forEach(ch=>{
+    const b = document.createElement("button");
+    b.className = "relative bg-slate-200 hover:bg-slate-300 rounded-lg px-2 py-2 font-bold text-base min-w-[40px]";
+    b.textContent = ch.toUpperCase();
+
+    b.addEventListener("click", ()=>{
+      // troba el següent slot buit que correspongui a aquesta lletra
+      const chLower = ch;
+
+      // llista d'índexs buits
+      const emptyIdx = [];
+      for(let i=0;i<letters.length;i++){
+        if(letters[i]==="-") continue;
+        if(slotEls[i].textContent==="") emptyIdx.push(i);
+      }
+      if(emptyIdx.length===0) return;
+
+      // primer índex buit que coincideixi amb la lletra clicada
+      const match = emptyIdx.find(i=>letters[i]===chLower);
+
+      if(match !== undefined){
+        slotEls[match].textContent = chLower.toUpperCase();
+        b.remove();
+
+        // completat?
+        const remaining = slotEls.some((s,i)=> letters[i] !== "-" && s.textContent==="");
+        if(!remaining){
+          complete();
+        }
+      } else {
+        // incorrecte: mark mistake (but don't count per-letter)
+        state.l3HadMistake = true;
+        // X vermella centrada
+        const existing = b.querySelector("span");
+        if(existing) existing.remove();
+        const x = document.createElement("span");
+        x.textContent = "✖";
+        x.style.position="absolute";x.style.inset="0";x.style.display="flex";x.style.alignItems="center";x.style.justifyContent="center";x.style.color="#dc2626";x.style.fontSize="1.6rem";x.style.fontWeight="900";x.style.pointerEvents="none";
+        b.appendChild(x);
+
+        state.l3HadMistake = true;
+      
+        b.classList.add("shake");
+        setTimeout(()=>b.classList.remove("shake"), 300);
+}
+    });
+
+    els.letterBank.appendChild(b);
+  });
+
+  setFeedback("", true);
+      try{ syncN6Audio(); }catch(e){}
+  setNextEnabled(false);
+  updateStatsUI();
+}
+
+function buildLevel4(v){
+  // Show main verb + meaning in smaller parentheses
+  const paren = (meaningForLang(v) || v.ca || "").trim();
+  els.questionText.innerHTML = "";
+  els.questionText.appendChild(document.createTextNode(v.inf));
+  if(paren){
+    els.questionText.appendChild(document.createTextNode(" "));
+    const s = document.createElement("span");
+    s.className = "tenseSmall";
+    s.textContent = "(" + paren + ")";
+    els.questionText.appendChild(s);
+  }
+  els.questionHint.textContent = UI[getLang()].hintL4;
+  const { options, correct } = makeLevel3Options(v);
+  renderMCQ(options, correct, ()=>{ state.progress[3].mastered[v.inf]=true; saveState(); updateStatsUI(); });
+}
+
+function buildLevel5(v){
+  // Show main verb + meaning in smaller parentheses
+  const paren = (meaningForLang(v) || v.ca || "").trim();
+  els.questionText.innerHTML = "";
+  els.questionText.appendChild(document.createTextNode(v.inf));
+  if(paren){
+    els.questionText.appendChild(document.createTextNode(" "));
+    const s = document.createElement("span");
+    s.className = "tenseSmall";
+    s.textContent = "(" + paren + ")";
+    els.questionText.appendChild(s);
+  }
+  els.questionHint.textContent = UI[getLang()].hintL5;
+  const { options, correct } = makeLevel4Options(v);
+  renderMCQ(options, correct, ()=>{ state.progress[4].mastered[v.inf]=true; saveState(); updateStatsUI(); });
+}
+
+function buildLevel6(v){
+  els.questionText.textContent = meaningForLang(v) || v.inf;
+  els.questionHint.innerHTML = UI[getLang()].hintL6;
+  els.level6Area.classList.remove("hidden");
+
+  const pool = makeLevel5Pool(v); // 5 options (mateixes als 3 selectors)
+
+  fillSelect(els.selInf, shuffle(pool));
+  fillSelect(els.selPast, shuffle(pool));
+  fillSelect(els.selPP, shuffle(pool));
+
+  els.selInf.value=""; els.selPast.value=""; els.selPP.value="";
+
+  
+
+  // FIX25: N6 audio buttons pronounce selected value (each tense)
+  function syncN6Audio(){
+    if(els.btnSpeakInf) els.btnSpeakInf.disabled = !els.selInf.value;
+    if(els.btnSpeakPast) els.btnSpeakPast.disabled = !els.selPast.value;
+    if(els.btnSpeakPP) els.btnSpeakPP.disabled = !els.selPP.value;
+  }
+  if(els.btnSpeakInf) els.btnSpeakInf.onclick = ()=>{ if(els.selInf.value) speakEN(els.selInf.value); };
+  if(els.btnSpeakPast) els.btnSpeakPast.onclick = ()=>{ if(els.selPast.value) speakEN(els.selPast.value); };
+  if(els.btnSpeakPP) els.btnSpeakPP.onclick = ()=>{ if(els.selPP.value) speakEN(els.selPP.value); };
+  syncN6Audio();
+
+// Next sempre desactivat fins encertar
+  setNextEnabled(false);
+
+  // helpers visuals
+  const wrapInf = els.selInf.closest(".bg-white");
+  const wrapPast = els.selPast.closest(".bg-white");
+  const wrapPP = els.selPP.closest(".bg-white");
+
+  // FIX54: reset last-ok transitions per question
+  state.n6LastOk = { inf:false, past:false, pp:false };
+
+  function clearWrap(w){
+    if(!w) return;
+    w.classList.remove("bg-green-100","border-green-500","bg-red-100","border-red-500");
+    w.classList.add("bg-white");
+  }
+  function setWrap(w, ok){
+    if(!w) return;
+    w.classList.remove("bg-white","bg-green-100","border-green-500","bg-red-100","border-red-500");
+    if(ok===null){
+      w.classList.add("bg-white");
+    } else if(ok){
+      w.classList.add("bg-green-100","border-green-500");
+    } else {
+      w.classList.add("bg-red-100","border-red-500");
+    }
+  }
+
+  // FIX51: reset wraps at start of each new question
+  setWrap(wrapInf, null); setWrap(wrapPast, null); setWrap(wrapPP, null);
+
+  // reset visuals when user changes a selector
+  [els.selInf, els.selPast, els.selPP].forEach(sel=>{
+    sel.addEventListener("change", ()=>{
+      // només netegem el seu wrap (per no perdre feedback dels altres)
+      if(sel===els.selInf) setWrap(wrapInf, null);
+      if(sel===els.selPast) setWrap(wrapPast, null);
+      if(sel===els.selPP) setWrap(wrapPP, null);
+      setFeedback("", true);
+      try{ syncN6Audio(); }catch(e){}
+    }, { once:false });
+  });
+
+  els.btnCheckLevel6.onclick = ()=>{
+    const a=els.selInf.value, b=els.selPast.value, c=els.selPP.value;
+
+    const hasInf = !!a, hasPast = !!b, hasPP = !!c;
+    const okInf = hasInf && (a===v.inf);
+    const okPast = hasPast && (b===v.past);
+    const okPP = hasPP && (c===v.pp);
+
+    if(!hasInf || !hasPast || !hasPP){
+      setFeedback(UI[getLang()].needAllSelects, false);
+      wiggle();
+    }
+
+        // FIX54: auto-audio triggers on GREEN transition (false -> true)
+    const prev = state.n6LastOk || {inf:false,past:false,pp:false};
+    const seq=[];
+    if(okInf && !prev.inf) seq.push(v.inf);
+    if(okPast && !prev.past) seq.push(v.past);
+    if(okPP && !prev.pp) seq.push(v.pp);
+
+    setWrap(wrapInf, okInf);
+    setWrap(wrapPast, okPast);
+    setWrap(wrapPP, okPP);
+
+    state.n6LastOk = { inf:!!okInf, past:!!okPast, pp:!!okPP };
+    try{ if(isAutoAudio() && seq.length) speakQueue(seq); }catch(e){}
+    const allOk = okInf && okPast && okPP;
+
+    if(allOk){
+      // ara sí: marquem com complet i deixem avançar
+      state.answered = true;
+      state.progress[6].correct += 1;
+      state.progress[6].mastered[v.inf]=true;
+
+      setFeedback(UI[getLang()].lvl6Good, true);
+      saveState(); updateStatsUI();
+      setNextEnabled(true);
+      maybeFinishLevel();
+    } else {
+      // permet reintentar tantes vegades com calgui
+      state.answered = false;
+      state.progress[6].wrong += 1;
+      setFeedback(UI[getLang()].stillNot, false);
+      saveState(); updateStatsUI();
+      setNextEnabled(false);
+      wiggle();
+    }
+  };
+
+  updateStatsUI();
+}
+
+
+function escHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function fillSelect(sel, options){
+  sel.innerHTML = `<option value="">— selecciona —</option>` +
+    options.map(o=>`<option value="${escHtml(o)}">${escHtml(o)}</option>`).join("");
+}
+
+
+
+
+function startLevel(lvl){
+  if(!isLevelUnlocked(lvl)){
+    setFeedback(UI[getLang()].lockedLevel, false);
+    return;
+  }
+
+  // Si ja estem dins aquest nivell i ja hi ha una pregunta, NO reiniciem ni canviem pregunta
+  if(state.currentLevel===lvl && state.current){
+    updateStatsUI(); // només per assegurar highlight
+    return;
+  }
+
+  state.currentLevel = lvl;
+  applyLevelMode();
+  setNoLevelMode(false);
+  try{ syncTenseFiltersUI();
+  syncStudyControlsUI();
+  syncStarUI(); }catch(e){}
+  state.queue = buildQueueForLevel(lvl);
+  state.qPos[lvl] = 0;
+  state.levelCompleteShown[lvl] = false;
+  state.retries[lvl] = [];
+  state.current = null;
+  state.answered = false;
+
+  saveState(); updateStatsUI();
+  nextQuestion();
+  updateSpeakButton(state.current);
+  // FIX40: auto audio for question
+  try{ if(isAutoAudio() && els.btnSpeak && !els.btnSpeak.classList.contains('hidden')) els.btnSpeak.click(); }catch(e){}
+}
+
+
+// Language selector
+(function initLang(){
+  const sel = document.getElementById("langSel");
+  if(sel){
+    sel.value = getLang();
+    sel.addEventListener("change", ()=>{
+      setLang(sel.value);
+      applyLanguage();
+    });
+  }
+})();
+els.levelBar.addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-level]");
+  if(!btn) return;
+  startLevel(parseInt(btn.dataset.level,10));
+});
+els.btnNext.addEventListener("click", ()=>{
+  if(els.btnNext.disabled) return;
+  nextQuestion();
+  updateSpeakButton(state.current);
+  // FIX40: auto audio for question
+  try{ if(isAutoAudio() && els.btnSpeak && !els.btnSpeak.classList.contains('hidden')) els.btnSpeak.click(); }catch(e){}
+});
+
+
+function openVerbList(){
+  const rows = DEFAULT_VERBS.map(v=>{
+    const ca = meaningForLang(v) || v.inf;
+    const inf=v.inf, past=v.past, pp=v.pp;
+    const eqAll = (inf===past && past===pp);
+    const eqInfPast = (inf===past && past!==pp);
+    const eqInfPP = (inf===pp && inf!==past);
+    const eqPastPP = (past===pp && past!==inf);
+
+    function cellClass(kind){
+      // kind: 'inf'|'past'|'pp'
+      // color scheme:
+      // - all equal: green for all three
+      // - exactly two equal: amber for the matching pair, third neutral
+      // - all different: slate for all three (same)
+      if(eqAll) return "bg-emerald-100";
+      if(eqInfPast){
+        if(kind==="inf"||kind==="past") return "bg-yellow-100";
+        return "bg-yellow-50";
+      }
+      if(eqInfPP){
+        if(kind==="inf"||kind==="pp") return "bg-yellow-100";
+        return "bg-yellow-50";
+      }
+      if(eqPastPP){
+        if(kind==="past"||kind==="pp") return "bg-yellow-100";
+        return "bg-yellow-50";
+      }
+      return "bg-orange-200";
+    }
+
+    return `<tr class="border-b">
+      <td class="px-3 py-2 font-mono ${cellClass("inf")}">${inf}</td>
+      <td class="px-3 py-2 font-mono ${cellClass("past")}">${past}</td>
+      <td class="px-3 py-2 font-mono ${cellClass("pp")}">${pp}</td>
+      <td class="px-3 py-2">${ca}</td>
+    </tr>`;
+  }).join("");
+
+  const page = `<!DOCTYPE html>
+  <html lang="ca"><head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Llista de verbs irregulars</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+  </head>
+  <body class="bg-slate-50 text-slate-800 p-4">
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow p-4 sm:p-6">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-bold">${UI[getLang()].listTitle}</h1>
+          <p class="text-sm text-slate-500 mt-1">${UI[getLang()].listSubtitle}</p>
+          <p class="text-xs text-slate-500 mt-1">
+            ${UI[getLang()].colors.label} <span class="inline-block px-2 py-0.5 rounded bg-emerald-200">${UI[getLang()].colors.easy}</span>
+            <span class="inline-block px-2 py-0.5 rounded bg-yellow-200 ml-1">${UI[getLang()].colors.mid}</span>
+            <span class="inline-block px-2 py-0.5 rounded bg-orange-100 ml-1">${UI[getLang()].colors.hard}</span>
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <input id="q" class="border rounded-lg px-3 py-2 w-full sm:w-72" placeholder="${UI[getLang()].searchPh}" />
+          <button id="btnClose" class="bg-slate-200 hover:bg-slate-300 rounded-lg px-3 py-2 font-bold">${UI[getLang()].close}</button>
+        </div>
+      </div>
+
+      <div class="mt-4 overflow-auto rounded-xl border">
+        <div class="overflow-x-auto -mx-3 px-3 pb-3"><table class="min-w-full text-sm">
+          <thead class="sticky top-0 bg-slate-100 z-10">
+            <tr class="text-left">
+              <th class="px-3 py-2">Infinitive</th>
+              <th class="px-3 py-2">Simple Past</th>
+              <th class="px-3 py-2">Past Participle</th>
+              <th class="px-3 py-2">${UI[getLang()].meaningHeader}</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">${rows}</tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <script>
+      const q = document.getElementById("q");
+      const tbody = document.getElementById("tbody");
+      const allRows = Array.from(tbody.querySelectorAll("tr"));
+      function norm(s){ return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+      q.addEventListener("input", ()=>{
+        const term = norm(q.value);
+        allRows.forEach(r=>{
+          const txt = norm(r.textContent);
+          r.style.display = (!term || txt.includes(term)) ? "" : "none";
+        });
+      });
+      document.getElementById("btnClose").addEventListener("click", ()=> window.close());
+    <\/script>
+  </body></html>`;
+
+  const w = window.open("", "_blank");
+  if(!w){
+    openModal("No s'ha pogut obrir", "<p>El navegador ha bloquejat la finestra emergent. Permet pop-ups per aquest fitxer i torna-ho a provar.</p>");
+    return;
+  }
+  w.document.open();
+  w.document.write(page);
+  w.document.close();
+}
+
+
+els.btnList.addEventListener("click", openVerbList);
+
+els.btnHelp.addEventListener("click", ()=>{ openModal(UI[getLang()].helpTitle, UI[getLang()].helpBody); });
+els.btnReset.addEventListener("click", ()=>{
+  const lvl = state.currentLevel;
+
+  if(!lvl){
+    openModal(UI[getLang()].resetModalTitle, `
+      <p>${UI[getLang()].selectLevelToStart}</p>
+      <div class="mt-4 flex gap-2 justify-end">
+        <button id="modalOkBtn" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition">${UI[getLang()].ok}</button>
+      </div>
+    `);
+    setTimeout(()=>{
+      const b=document.getElementById("modalOkBtn");
+      if(b) b.onclick = closeModal;
+    },0);
+    return;
+  }
+
+  openModal(UI[getLang()].resetModalTitle, `
+    <p>${UI[getLang()].resetConfirmBody(lvl)}</p>
+    <p class="mt-2 text-slate-600">${UI[getLang()].resetWarn}</p>
+    <div class="mt-4 flex gap-2 justify-end">
+      <button id="cancelReset" class="bg-slate-200 text-slate-800 font-semibold px-4 py-2 rounded-lg hover:bg-slate-300 transition">${UI[getLang()].cancel}</button>
+      <button id="confirmReset" class="bg-red-600 text-white font-semibold px-4 py-2 rounded hover:bg-red-700 transition">${UI[getLang()].resetConfirmBtn}</button>
+    </div>
+  `, { showOk: false });
+
+  setTimeout(()=>{
+    const btn=document.getElementById("confirmReset");
+    const c=document.getElementById("cancelReset");
+    if(c) c.onclick = closeModal;
+    if(btn) btn.onclick = ()=>{
+      // Reinicia NOMÉS el nivell actual
+      state.progress[lvl] = { mastered: {}, correct: 0, wrong: 0 };
+      state.retries[lvl] = [];
+      state.queue = [];
+      state.current = null;
+      state.answered = false;
+
+      saveState();
+      closeModal();
+
+      // Torna a començar el nivell des de la primera pregunta
+      startLevel(lvl);
+
+      updateStatsUI();
+    };
+  },0);
+});
+
+
+applyFixedSideButtonWidth();
+setNoLevelMode(true);
+
+updateStatsUI();
+updateLevelButtons();
+setNextEnabled(false);
+</script>
+</body>
+</html>
