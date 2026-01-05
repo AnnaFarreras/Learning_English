@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ca">
 <head>
@@ -7,6 +8,29 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
   .hidden{display:none !important;}
+.optRow{
+  display:flex;
+  align-items:stretch;
+  gap:.6rem;
+  margin-bottom:.75rem;
+}
+.optAudio{
+  width:32px;
+  min-width:32px;
+  height:32px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:0.5rem;
+  font-size:0.9rem;
+  padding:0;
+  border:1px solid rgba(15,23,42,.18);
+  background:rgba(226,232,240,.9);
+  opacity:.55;
+  align-self:center;
+}
+
+
 
     .card { box-shadow: 0 10px 25px rgba(0,0,0,.08); }
     .btn-disabled { opacity:.55; pointer-events:none; }
@@ -80,11 +104,14 @@
 
 
     /* Level 3 tense filters (right side) */
-    #tenseFilters{ justify-self:end; align-self:start; }
-    #tenseFilters .tenseBox{ width: max-content; }
+    #tenseFilters{ justify-self:end; align-self:start;  grid-column:3; grid-row:2; }
+    @media (min-width: 641px){
+  #tenseFilters .tenseBox{ width: max-content; }
+}
 
   :root{--sideBtnW:160px;}
   #btnHelp,#btnList{width:var(--sideBtnW); white-space:nowrap; text-align:center;}
+  #btnStats{width:auto; min-width:unset;}
 
 /* --- Layout polish: keep start message & verb on one line when possible (responsive) --- */
 #questionText{
@@ -109,7 +136,7 @@
     /* --- fixes: visibility + header layout --- */
     #questionHint{margin:4px 0 3px 0;}
 
-    .hidden{display:none!important;}
+    
     
     .quizHeaderGrid.noLevel{grid-template-columns:1fr; justify-items:center;}
 .quizHeaderGrid{
@@ -135,7 +162,11 @@
       /* on very small screens, let the verb wrap and avoid pushing filters down */
       #questionText{ white-space:normal; overflow-wrap:anywhere; }
       .quizHeaderGrid{ grid-template-columns:auto 1fr auto; }
-    }
+
+      /* Level 3: keep tense selectors on ONE centered row under reset buttons */
+      
+      
+}
 
   
 /* N3: tense label smaller */
@@ -216,28 +247,20 @@ body.lvl3 #progressSection{ margin-top: .6rem !important; }
 /* FIX26: Hide top speak button on levels where the question is NOT English (N2, N3, N6) */
 body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !important; }
 
-
-
-
-.optRow{
-  display:flex;
-  align-items:center;
-  gap:.6rem;
-  margin-bottom:.75rem;
+/* FIX60: Ensure audio button is always visible on mobile for levels 1, 4, 5 */
+@media (max-width: 640px){
+  body.lvl1 #btnSpeak, body.lvl4 #btnSpeak, body.lvl5 #btnSpeak{ 
+    display:flex !important; 
+    visibility:visible !important;
+    opacity:1 !important;
+  }
 }
+
+
 .optRow .mcqBtn{
   flex:1 1 auto;
 }
-.optRow .optAudio{
-  width:44px;
-  min-width:44px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:.75rem;
-  background:#e2e8f0;
-  opacity:.45;
-}
+.optRow 
 .optRow .optAudio:disabled{
   cursor:not-allowed;
 }
@@ -246,58 +269,21 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
 }
 
 
-.optRow{
-  display:flex;
-  align-items:stretch;
-  gap:.6rem;
-  margin-bottom:.75rem;
-}
+
 .optRow .mcqBtn{ flex:1 1 auto; }
-.optRow .optAudio{
-  width:44px;
-  min-width:44px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:.75rem;
-  border:1px solid rgba(15,23,42,.18);
-  background:rgba(226,232,240,.9);
-  opacity:.55;
-}
+.optRow 
 .optRow .optAudio.optAudioOn{ opacity:1; }
 
 
 /* FIX34: Adjacent audio icon rows (only used in N2/N4/N5) */
-.optRow{
-  display:flex;
-  align-items:stretch;
-  gap:.6rem;
-  margin-bottom:.75rem;
-}
+
 .optRow .optBtn{ flex:1 1 auto; }
-.optRow .optAudio{
-  width:44px;
-  min-width:44px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:.75rem;
-  border:1px solid rgba(15,23,42,.18);
-  background:rgba(226,232,240,.9);
-  opacity:.55;
-}
+.optRow 
 .optRow .optAudio.optAudioOn{ opacity:1; }
 
 
 /* FIX36: Smaller, consistent audio icons for N2/N4/N5 options */
-.optRow .optAudio{
-  width:32px;
-  min-width:32px;
-  height:32px;
-  border-radius:0.5rem;
-  font-size:0.9rem;
-  padding:0;
-}
+.optRow 
 .optRow .optAudio svg,
 .optRow .optAudio span{
   transform: scale(0.9);
@@ -305,7 +291,7 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
 
 
 /* FIX38: center audio buttons in rows */
-.optRow .optAudio{ align-self:center; }
+.optRow 
 
 /* FIX41: place audio mode selector on the left side of header */
 .audioModeSel{
@@ -323,6 +309,337 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
 /* FIX51: In level 3, left header stack vertically so tense filters sit BELOW title row */
 .lvl3LeftCol{ display:flex; flex-direction:column; align-items:flex-start; gap:.5rem; }
 #lvlTopRow{ display:flex; align-items:center; gap:.75rem; }
+
+/* Mòbil: títol i botó apilats al Nivell 3 */
+@media (max-width: 640px){
+  body.lvl3 #levelHeaderLeft #lvlTopRow{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.4rem !important;
+  }
+}
+
+/* ===== Header responsive fix (mobile first open) ===== */
+/* Give the title padding on BOTH sides to avoid overlapping absolute selectors */
+#appTitle { padding-left: 7rem; padding-right: 7rem; }
+
+/* On small screens, convert the header to a grid so selectors stay on top row
+   and the title drops below them (no overlap). */
+
+
+/* On larger screens, keep normal flow; let Tailwind handle sizes */
+@media (min-width: 481px){
+  #appTitle { white-space: nowrap; }
+}
+
+
+/* ===== HEADER: on small screens put title UNDER selectors ===== */
+@media (max-width: 520px) {
+  header.mb-3.relative{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "audio lang"
+      "title title"
+      "sub sub";
+    column-gap: 12px;
+    row-gap: 10px;
+    align-items: center;
+  }
+  header.mb-3.relative > div.absolute.left-0.top-0{
+    grid-area: audio;
+    position: static !important;
+    justify-self: start;
+  }
+  header.mb-3.relative > div.absolute.right-0.top-0{
+    grid-area: lang;
+    position: static !important;
+    justify-self: end;
+  }
+  header.mb-3.relative > h1#appTitle{
+    grid-area: title;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-top: 2px;
+  }
+  header.mb-3.relative > p#appSubtitle{
+    grid-area: sub;
+    margin-top: 0 !important;
+  }
+}
+
+/* ===== QUIZ HEADER: Mobile layout (keep desktop unchanged) =====
+   Goal on small screens:
+   - Left: "Nivell X" with "Reinicia" UNDER it (left aligned)
+   - Right: "Només ⭐" on one line, and "Reinicia ⭐" UNDER it (right aligned)
+   - Center: if there is audio (🔊), it sits centered on its own line ABOVE the verb line
+            then ⭐ + verb centered together; if verb has extra text (e.g., in parentheses)
+            it can wrap to next line naturally.
+*/
+@media (max-width: 640px){
+  .quizHeaderGrid{
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas:
+      "left right"
+      "center center"
+      "tense tense" !important;
+    gap: 0.75rem !important;
+    align-items: start !important;
+  }
+  /* Left block: title + reset stacked, aligned left */
+  #levelHeaderLeft{
+    grid-area: left !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.4rem !important;
+    min-width: 0;
+  }
+  #btnReset{
+    align-self: flex-start !important;
+  }
+  /* Right block: study controls stay top-right */
+  #rightPanel{
+    grid-area: right !important;
+    width: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+    gap: 0.35rem !important;
+  }
+  
+  #studyControls{
+    width: auto !important;
+    align-items: flex-end !important;
+  }
+  
+  #studyControls label{
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    justify-content: flex-end !important;
+    white-space: nowrap;
+  }
+  
+  #btnResetStars{
+    align-self: flex-end !important;
+  }
+  /* Center block: ALWAYS below left+right (prevents long verbs being cut) */
+  #questionCenter{
+    grid-area: center !important;
+    width: 100% !important;
+    justify-self: stretch !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding-top: 0.1rem;
+    min-width: 0;
+  }
+  
+  #btnSpeak{
+    order: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  
+  #btnStar{
+    order: 1 !important;
+    flex-shrink: 0 !important;
+  }
+  
+  #questionText{
+    order: 2 !important;
+    text-align: center !important;
+    justify-self: stretch !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.15;
+    flex-shrink: 1 !important;
+  }
+  /* If audio is hidden in a level, collapse the audio row */
+  #btnSpeak
+  
+  /* Tense filters (general): below center, centered */
+#tenseFilters{
+  grid-area: tense !important;
+  justify-self: stretch !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+  
+  /* NIVELL 3: Canviar ordre - selectors ABANS del verb */
+body.lvl3 #quizHeaderGrid{
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-areas:
+    "left right"
+    "left right"
+    "tense tense"
+    "center center" !important;
+  gap: 0.5rem !important;
+}
+
+body.lvl3 #levelHeaderLeft{
+  grid-area: left !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.4rem !important;
+  width: 100% !important;
+  justify-self: stretch !important;
+  align-self: stretch !important;
+}
+
+body.lvl3 #rightPanel{
+  grid-area: right !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.4rem !important;
+}
+
+body.lvl3 #tenseFilters{
+  grid-area: tense !important;
+  grid-column: 1 / -1 !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  margin-top: 0.5rem !important;
+  display: block !important;
+}
+
+
+#tenseFilters .tenseBox{
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  align-items: center !important;
+  justify-items: center !important;
+  margin: 0 auto !important;
+}
+
+#tenseFilters .tenseBox label{
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .35rem !important;
+  white-space: nowrap !important;
+}
+
+
+body.lvl3 #questionCenter{
+  grid-area: center !important;
+  margin-top: 0.5rem !important;
+}
+  
+/* --- Pregunta: mantenir 🔊 + ⭐ + VERB junts i el text entre parèntesis a sota --- */
+  #questionCenter{
+    display:flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .5rem !important;
+  }
+
+  /* Els botons no han de "estirar-se" */
+  #btnSpeak, #btnStar{ flex: 0 0 auto !important; }
+
+  /* Convertim el contenidor de text en "contents" perquè els spans siguin items del flex */
+  #questionText{
+    display: contents !important;
+  }
+
+  /* Verb principal */
+  #questionText .qMain{
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    font-size: 1.35rem !important;
+    font-weight: 700;
+    text-align: center !important;
+    line-height: 1.15;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Parèntesis (significat/tense) sempre a la línia de sota */
+  #questionText .qParen{
+    flex: 0 1 auto !important;          /* queda a la mateixa línia si hi cap */
+    max-width: 100% !important;
+    display: inline-block !important;
+    text-align: center !important;
+    margin-left: .15rem !important;
+    white-space: nowrap !important;      /* manté el parèntesi junt */
+  }
+
+/* Si 🔊 està amagat en algun nivell */
+  #btnSpeak
+/* --- Nivell 6: compactar (label + select a la mateixa línia) --- */
+  body.lvl6 #level6Area .grid > div{
+    display:flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: .75rem !important;
+    padding-top: .6rem !important;
+    padding-bottom: .6rem !important;
+  }
+  body.lvl6 #level6Area .grid > div > div.text-xs{
+    margin: 0 !important;
+    min-width: 72px !important;   /* etiqueta curta (Inf / Past / PP) */
+    white-space: nowrap !important;
+  }
+  body.lvl6 #level6Area .grid > div > div.flex{
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  body.lvl6 #level6Area select{
+    width: 100% !important;
+  }
+}
+/* FIX: Level 3 tense filters - full width and centered on mobile */
+@media (max-width: 640px) {
+  body.lvl3 #tenseFilters {
+    grid-area: tense !important;
+    justify-self: stretch !important;
+    align-self: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  #tenseFilters .tenseBox {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    align-items: center !important;
+    justify-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem !important;
+    margin: 0 !important;
+  }
+  
+  #tenseFilters .tenseBox label {
+    width: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .35rem !important;
+    white-space: nowrap !important;
+  }
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen p-3 sm:p-4">
@@ -341,7 +658,7 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
       <option value="ka">ქართული</option>
     </select>
       </div>
-      <h1 id="appTitle" class="text-xl sm:text-2xl font-bold text-center pr-28">Verbs Irregulars anglesos</h1>
+      <h1 id="appTitle" class="text-xl sm:text-2xl font-bold text-center px-28">Verbs Irregulars anglesos</h1>
       <p id="appSubtitle" class="text-center text-slate-500 mt-1 text-sm">
         6 nivells. No pugis de nivell fins haver encertat tots els verbs almenys 1 cop.
       </p>
@@ -356,11 +673,12 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
           <button data-level="4" class="levelBtn shrink-0 bg-emerald-500 text-white px-3 py-1 rounded hover:bg-emerald-600 transition text-sm">N4</button>
           <button data-level="5" class="levelBtn shrink-0 bg-amber-500 text-white px-3 py-1 rounded hover:bg-amber-600 transition text-sm">N5</button>
           <button data-level="6" class="levelBtn shrink-0 bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition text-sm">N6</button>
+          <button id="btnStats" class="shrink-0 bg-slate-200 text-slate-800 font-bold px-3 py-1 rounded hover:bg-slate-300 transition text-sm" title="📊">📊</button>
         </div>
         
 
         <div class="flex flex-col gap-2 items-end">
-          <button id="btnHelp" class="bg-slate-200 text-slate-800 font-bold px-2 py-1 rounded hover:bg-slate-300 transition text-xs min-w-[110px] text-center" style="white-space:nowrap; ">Instruccions</button>
+<button id="btnHelp" class="bg-slate-200 text-slate-800 font-bold px-2 py-1 rounded hover:bg-slate-300 transition text-xs min-w-[110px] text-center" style="white-space:nowrap; ">Instruccions</button>
 <button id="btnList" class="bg-emerald-600 text-white font-bold px-2 py-1 rounded hover:bg-emerald-700 transition text-xs min-w-[110px] text-center" style="white-space:nowrap; ">Llista de verbs</button>
         </div>
       </div>
@@ -392,6 +710,7 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
           </label>
           <button id="btnResetStars" class="miniResetStars">Reinicia ⭐</button>
         </div>
+        </div>
         <div id="tenseFilters" class="hidden tenseFilters">
           <div class="tenseBox bg-white/60 border border-slate-200 rounded-lg px-2 py-2 flex flex-col gap-1 items-start">
             <label class="flex items-center gap-1 text-xs cursor-pointer select-none">
@@ -407,7 +726,7 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
               <span id="tensePPLbl">Past Participle</span>
             </label>
           </div>
-        </div></div>
+        </div>
     
       </div>
 
@@ -474,7 +793,7 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
     
 <div class="mb-4" id="progressSection">
       <div class="flex justify-between text-sm text-slate-600 mb-1">
-        <span id="lblProgress">Progrés del nivell</span>
+        <span><span id="lblProgress">Progrés del nivell</span> <span id="progressRemain" class="text-slate-500"></span></span>
         <span id="progressPct">0%</span>
       </div>
       <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
@@ -489,7 +808,7 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
     
 <div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
       <div class="bg-white rounded-2xl p-5 max-w-lg w-full">
-        <div class="flex justify-between items-center gap-3">
+        <div id="statsHeader" class="flex justify-between items-center gap-3">
           <h2 id="modalTitle" class="text-xl font-bold"></h2>
           <button id="modalClose" class="text-slate-500 hover:text-slate-800 text-2xl leading-none">&times;</button>
         </div>
@@ -499,7 +818,84 @@ body.lvl2 #btnSpeak, body.lvl3 #btnSpeak, body.lvl6 #btnSpeak{ display:none !imp
         </div>
       </div>
     </div>
+  
+<!-- Stats Modal -->
+<div id="statsModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+  <div id="statsCard" class="bg-white rounded-2xl p-5 max-w-3xl w-full shadow-xl">
+    <div class="flex justify-between items-center gap-3">
+      <div class="flex items-center gap-2">
+        <span aria-hidden="true">📊</span>
+        <h2 id="statsTitle" class="text-xl font-bold">Estadístiques</h2>
+      </div>
+      <button id="statsCloseX" class="text-slate-500 hover:text-slate-800 text-2xl leading-none" aria-label="Tancar">&times;</button>
+    </div>
+
+    <div class="mt-4 flex gap-2 flex-wrap">
+      <button class="statsTabBtn px-3 py-1.5 rounded-full bg-slate-200 text-slate-800 text-sm" data-tab="levels">Per nivell</button>
+      <button class="statsTabBtn px-3 py-1.5 rounded-full bg-slate-200 text-slate-800 text-sm" data-tab="difficult">Difícils</button>
+      <button class="statsTabBtn px-3 py-1.5 rounded-full bg-slate-200 text-slate-800 text-sm" data-tab="rounds">Per rondes</button>
+    </div>
+
+    <div class="mt-4">
+      <div id="statsTab_levels" class="statsTabPanel hidden"></div>
+      <div id="statsTab_difficult" class="statsTabPanel hidden"></div>
+      <div id="statsTab_rounds" class="statsTabPanel hidden"></div>
+    </div>
+
+    <div class="mt-5 flex justify-end gap-2">
+      <button id="statsCloseBtn" class="bg-slate-200 text-slate-800 font-bold px-4 py-2 rounded-lg hover:bg-slate-300 transition">Tancar</button>
+    </div>
   </div>
+</div>
+<!-- Verb List Modal -->
+<div id="verbListModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-3 sm:p-4 z-50">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="px-4 sm:px-5 py-3 border-b flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <h2 id="verbListTitle" class="text-lg sm:text-xl font-bold leading-tight">Llista de verbs</h2>
+        <p id="verbListSubtitle" class="text-xs sm:text-sm text-slate-600 mt-1">
+          <span id="verbListCount" class="font-semibold">0</span>
+          <span id="verbListCountSuffix"> verbs</span>
+        </p>
+      </div>
+      <button id="verbListCloseX" class="text-slate-500 hover:text-slate-800 text-2xl leading-none">&times;</button>
+    </div>
+
+    <div class="px-4 sm:px-5 py-3 border-b">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="text-xs text-slate-600">
+          <span id="verbListColorsLabel">Colors:</span>
+          <button type="button" class="verbColorBtn inline-block px-2 py-1 rounded bg-emerald-200 ml-2" data-filter="easy">Fàcil</button>
+          <button type="button" class="verbColorBtn inline-block px-2 py-1 rounded bg-yellow-200 ml-1" data-filter="mid">Mitjà</button>
+          <button type="button" class="verbColorBtn inline-block px-2 py-1 rounded bg-orange-200 ml-1" data-filter="hard">Difícil</button>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="verbListSearch" class="border rounded-lg px-3 py-2 w-full sm:w-80" placeholder="Cerca..." />
+          <button id="verbListCloseBtn" class="bg-slate-200 hover:bg-slate-300 rounded-lg px-3 py-2 font-bold">Tancar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-auto">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="sticky top-0 bg-slate-50 border-b">
+            <tr>
+              <th id="verbListThInf" class="text-left px-3 py-2">Infinitiu</th>
+              <th id="verbListThPast" class="text-left px-3 py-2">Passat</th>
+              <th id="verbListThPP" class="text-left px-3 py-2">Participi</th>
+              <th id="verbListThTr" class="text-left px-3 py-2">Traducció</th>
+            </tr>
+          </thead>
+          <tbody id="verbListTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
 
 <script>
 const DEFAULT_VERBS = [{"inf": "arise", "past_raw": "arose", "pp_raw": "arisen", "past": "arose", "pp": "arisen", "es": "surgir", "ca": "sorgir", "ka": "წარმოშობა / აღმოცენება"}, {"inf": "be", "past_raw": "was / were", "pp_raw": "been", "past": "was", "pp": "been", "es": "ser/estar", "ca": "ser/estar", "ka": "ყოფნა"}, {"inf": "beat", "past_raw": "beat", "pp_raw": "beaten", "past": "beat", "pp": "beaten", "es": "golpear / vencer", "ca": "colpejar / vèncer", "ka": "ცემა / დარტყმა"}, {"inf": "become", "past_raw": "became", "pp_raw": "become", "past": "became", "pp": "become", "es": "convertirse en", "ca": "esdevenir / convertir-se en", "ka": "გახდომა"}, {"inf": "begin", "past_raw": "began", "pp_raw": "begun", "past": "began", "pp": "begun", "es": "empezar", "ca": "començar", "ka": "დაწყება"}, {"inf": "bet", "past_raw": "bet/betted", "pp_raw": "bet/betted", "past": "bet", "pp": "bet", "es": "apostar", "ca": "apostar", "ka": "დანაძლევება"}, {"inf": "bite", "past_raw": "bit", "pp_raw": "bitten", "past": "bit", "pp": "bitten", "es": "morder", "ca": "mossegar", "ka": "კბენა"}, {"inf": "bleed", "past_raw": "bled", "pp_raw": "bled", "past": "bled", "pp": "bled", "es": "sangrar", "ca": "sagnar", "ka": "სისხლდენა"}, {"inf": "blow", "past_raw": "blew", "pp_raw": "blown", "past": "blew", "pp": "blown", "es": "soplar", "ca": "bufar", "ka": "დაბერვა"}, {"inf": "break", "past_raw": "broke", "pp_raw": "broken", "past": "broke", "pp": "broken", "es": "romper", "ca": "trencar", "ka": "გატეხვა"}, {"inf": "bring", "past_raw": "brought", "pp_raw": "brought", "past": "brought", "pp": "brought", "es": "traer", "ca": "portar", "ka": "მოტანა"}, {"inf": "build", "past_raw": "built", "pp_raw": "built", "past": "built", "pp": "built", "es": "construir", "ca": "construir", "ka": "აშენება"}, {"inf": "buy", "past_raw": "bought", "pp_raw": "bought", "past": "bought", "pp": "bought", "es": "comprar", "ca": "comprar", "ka": "ყიდვა"}, {"inf": "catch", "past_raw": "caught", "pp_raw": "caught", "past": "caught", "pp": "caught", "es": "atrapar", "ca": "atrapar / agafar", "ka": "დაჭერა"}, {"inf": "choose", "past_raw": "chose", "pp_raw": "chosen", "past": "chose", "pp": "chosen", "es": "elegir", "ca": "triar / escollir", "ka": "არჩევა"}, {"inf": "come", "past_raw": "came", "pp_raw": "come", "past": "came", "pp": "come", "es": "venir", "ca": "venir", "ka": "მოსვლა"}, {"inf": "cost", "past_raw": "cost", "pp_raw": "cost", "past": "cost", "pp": "cost", "es": "costar", "ca": "costar", "ka": "ღირება"}, {"inf": "creep", "past_raw": "crept", "pp_raw": "crept", "past": "crept", "pp": "crept", "es": "arrastrarse", "ca": "arrossegar-se", "ka": "ცოცვა"}, {"inf": "cut", "past_raw": "cut", "pp_raw": "cut", "past": "cut", "pp": "cut", "es": "cortar", "ca": "tallar", "ka": "ჭრა"}, {"inf": "deal", "past_raw": "dealt", "pp_raw": "dealt", "past": "dealt", "pp": "dealt", "es": "tratar (con) / repartir", "ca": "tractar (amb) / repartir", "ka": "გარიგება / ვაჭრობა"}, {"inf": "do", "past_raw": "did", "pp_raw": "done", "past": "did", "pp": "done", "es": "hacer", "ca": "fer", "ka": "კეთება"}, {"inf": "draw", "past_raw": "drew", "pp_raw": "drawn", "past": "drew", "pp": "drawn", "es": "dibujar", "ca": "dibuixar", "ka": "ხატვა / ხაზვა"}, {"inf": "dream", "past_raw": "dreamt/dreamed", "pp_raw": "dreamt/dreamed", "past": "dreamt", "pp": "dreamt", "es": "soñar", "ca": "somiar", "ka": "ოცნება"}, {"inf": "drink", "past_raw": "drank", "pp_raw": "drunk", "past": "drank", "pp": "drunk", "es": "beber", "ca": "beure", "ka": "დალევა"}, {"inf": "drive", "past_raw": "drove", "pp_raw": "driven", "past": "drove", "pp": "driven", "es": "conducir", "ca": "conduir", "ka": "მართვა"}, {"inf": "eat", "past_raw": "ate", "pp_raw": "eaten", "past": "ate", "pp": "eaten", "es": "comer", "ca": "menjar", "ka": "ჭამა"}, {"inf": "fall", "past_raw": "fell", "pp_raw": "fallen", "past": "fell", "pp": "fallen", "es": "caer", "ca": "caure", "ka": "დაცემა"}, {"inf": "feed", "past_raw": "fed", "pp_raw": "fed", "past": "fed", "pp": "fed", "es": "alimentar", "ca": "alimentar", "ka": "კვება"}, {"inf": "feel", "past_raw": "felt", "pp_raw": "felt", "past": "felt", "pp": "felt", "es": "sentir", "ca": "sentir", "ka": "გრძნობა"}, {"inf": "fight", "past_raw": "fought", "pp_raw": "fought", "past": "fought", "pp": "fought", "es": "luchar", "ca": "lluitar", "ka": "ბრძოლა"}, {"inf": "find", "past_raw": "found", "pp_raw": "found", "past": "found", "pp": "found", "es": "encontrar", "ca": "trobar", "ka": "პოვნა"}, {"inf": "flee", "past_raw": "fled", "pp_raw": "fled", "past": "fled", "pp": "fled", "es": "huir", "ca": "fugir", "ka": "გაქცევა"}, {"inf": "fly", "past_raw": "flew", "pp_raw": "flown", "past": "flew", "pp": "flown", "es": "volar", "ca": "volar", "ka": "ფრენა"}, {"inf": "forget", "past_raw": "forgot", "pp_raw": "forgotten", "past": "forgot", "pp": "forgotten", "es": "olvidar", "ca": "oblidar", "ka": "დავიწყება"}, {"inf": "forgive", "past_raw": "forgave", "pp_raw": "forgiven", "past": "forgave", "pp": "forgiven", "es": "perdonar", "ca": "perdonar", "ka": "მიტევება"}, {"inf": "forsake", "past_raw": "forsook", "pp_raw": "forsaken", "past": "forsook", "pp": "forsaken", "es": "abandonar", "ca": "abandonar", "ka": "მიტოვება"}, {"inf": "freeze", "past_raw": "froze", "pp_raw": "frozen", "past": "froze", "pp": "frozen", "es": "congelar(se)", "ca": "congelar(-se)", "ka": "გაყინვა"}, {"inf": "get", "past_raw": "got", "pp_raw": "got", "past": "got", "pp": "got", "es": "conseguir / obtener", "ca": "aconseguir / obtenir", "ka": "მიღება"}, {"inf": "give", "past_raw": "gave", "pp_raw": "given", "past": "gave", "pp": "given", "es": "dar", "ca": "donar", "ka": "მიცემა"}, {"inf": "go", "past_raw": "went", "pp_raw": "gone", "past": "went", "pp": "gone", "es": "ir", "ca": "anar", "ka": "წასვლა"}, {"inf": "grind", "past_raw": "ground", "pp_raw": "ground", "past": "ground", "pp": "ground", "es": "moler / triturar", "ca": "moldre / triturar", "ka": "დაფქვა"}, {"inf": "grow", "past_raw": "grew", "pp_raw": "grown", "past": "grew", "pp": "grown", "es": "crecer", "ca": "créixer", "ka": "გაზრდა"}, {"inf": "hang", "past_raw": "hung", "pp_raw": "hung", "past": "hung", "pp": "hung", "es": "colgar", "ca": "penjar", "ka": "დაკიდება"}, {"inf": "have", "past_raw": "had", "pp_raw": "had", "past": "had", "pp": "had", "es": "tener", "ca": "tenir", "ka": "ქონა"}, {"inf": "hear", "past_raw": "heard", "pp_raw": "heard", "past": "heard", "pp": "heard", "es": "oír", "ca": "sentir (oïda)", "ka": "სმენა"}, {"inf": "hide", "past_raw": "hid", "pp_raw": "hidden", "past": "hid", "pp": "hidden", "es": "esconder", "ca": "amagar", "ka": "დამალვა"}, {"inf": "hit", "past_raw": "hit", "pp_raw": "hit", "past": "hit", "pp": "hit", "es": "golpear", "ca": "colpejar", "ka": "დარტყმა"}, {"inf": "hold", "past_raw": "held", "pp_raw": "held", "past": "held", "pp": "held", "es": "sostener / aguantar", "ca": "aguantar / sostenir", "ka": "დაჭერა / დაჭერა-შენარჩუნება"}, {"inf": "hurt", "past_raw": "hurt", "pp_raw": "hurt", "past": "hurt", "pp": "hurt", "es": "herir / doler", "ca": "ferir / fer mal", "ka": "ტკენა / დაზიანება"}, {"inf": "keep", "past_raw": "kept", "pp_raw": "kept", "past": "kept", "pp": "kept", "es": "mantener / guardar", "ca": "mantenir / guardar", "ka": "შენარჩუნება / შენახვა"}, {"inf": "kneel", "past_raw": "knelt", "pp_raw": "knelt", "past": "knelt", "pp": "knelt", "es": "arrodillarse", "ca": "agenollar-se", "ka": "დაჩოქება"}, {"inf": "know", "past_raw": "knew", "pp_raw": "known", "past": "knew", "pp": "known", "es": "saber / conocer", "ca": "saber / conèixer", "ka": "ცოდნა / გაცნობა"}, {"inf": "lead", "past_raw": "led", "pp_raw": "led", "past": "led", "pp": "led", "es": "liderar / guiar", "ca": "liderar / guiar", "ka": "წაყვანა / ხელმძღვანელობა"}, {"inf": "learn", "past_raw": "learnt/learned", "pp_raw": "learnt/learned", "past": "learnt", "pp": "learnt", "es": "aprender", "ca": "aprendre", "ka": "სწავლა"}, {"inf": "leave", "past_raw": "left", "pp_raw": "left", "past": "left", "pp": "left", "es": "dejar / irse", "ca": "deixar / marxar", "ka": "დატოვება"}, {"inf": "lend", "past_raw": "lent", "pp_raw": "lent", "past": "lent", "pp": "lent", "es": "prestar", "ca": "prestar", "ka": "სესხება"}, {"inf": "let", "past_raw": "let", "pp_raw": "let", "past": "let", "pp": "let", "es": "dejar / permitir", "ca": "deixar / permetre", "ka": "დაშვება / ნება დართვა"}, {"inf": "lie", "past_raw": "lay", "pp_raw": "lain", "past": "lay", "pp": "lain", "es": "tumbarse / yacer", "ca": "jeure / estirar-se", "ka": "წოლა"}, {"inf": "lose", "past_raw": "lost", "pp_raw": "lost", "past": "lost", "pp": "lost", "es": "perder", "ca": "perdre", "ka": "დაკარგვა"}, {"inf": "make", "past_raw": "made", "pp_raw": "made", "past": "made", "pp": "made", "es": "hacer / fabricar", "ca": "fer / fabricar", "ka": "გაკეთება / შექმნა"}, {"inf": "mean", "past_raw": "meant", "pp_raw": "meant", "past": "meant", "pp": "meant", "es": "significar", "ca": "significar / voler dir", "ka": "ნიშნავდეს"}, {"inf": "meet", "past_raw": "met", "pp_raw": "met", "past": "met", "pp": "met", "es": "conocer / encontrarse", "ca": "conèixer / trobar-se", "ka": "შეხვედრა / გაცნობა"}, {"inf": "pay", "past_raw": "paid", "pp_raw": "paid", "past": "paid", "pp": "paid", "es": "pagar", "ca": "pagar", "ka": "გადახდა"}, {"inf": "put", "past_raw": "put", "pp_raw": "put", "past": "put", "pp": "put", "es": "poner", "ca": "posar", "ka": "დადება / ჩადება"}, {"inf": "quit", "past_raw": "quit/quitted", "pp_raw": "quit/quitted", "past": "quit", "pp": "quit", "es": "dejar / abandonar", "ca": "deixar / abandonar", "ka": "შეწყვეტა / მიტოვება"}, {"inf": "read", "past_raw": "read", "pp_raw": "read", "past": "read", "pp": "read", "es": "leer", "ca": "llegir", "ka": "კითხვა"}, {"inf": "ride", "past_raw": "rode", "pp_raw": "ridden", "past": "rode", "pp": "ridden", "es": "montar (en bici/caballo)", "ca": "muntar (en bici/cavall)", "ka": "ტარება / ცხენოსნობა"}, {"inf": "ring", "past_raw": "rang", "pp_raw": "rung", "past": "rang", "pp": "rung", "es": "sonar / llamar", "ca": "sonar / trucar", "ka": "დარეკვა"}, {"inf": "rise", "past_raw": "rose", "pp_raw": "risen", "past": "rose", "pp": "risen", "es": "levantarse / subir", "ca": "aixecar-se / pujar", "ka": "ამაღლება / აწევა"}, {"inf": "run", "past_raw": "ran", "pp_raw": "run", "past": "ran", "pp": "run", "es": "correr", "ca": "córrer", "ka": "სირბილი"}, {"inf": "say", "past_raw": "said", "pp_raw": "said", "past": "said", "pp": "said", "es": "decir", "ca": "dir", "ka": "თქმა"}, {"inf": "see", "past_raw": "saw", "pp_raw": "seen", "past": "saw", "pp": "seen", "es": "ver", "ca": "veure", "ka": "ნახვა"}, {"inf": "sell", "past_raw": "sold", "pp_raw": "sold", "past": "sold", "pp": "sold", "es": "vender", "ca": "vendre", "ka": "გაყიდვა"}, {"inf": "send", "past_raw": "sent", "pp_raw": "sent", "past": "sent", "pp": "sent", "es": "enviar", "ca": "enviar", "ka": "გაგზავნა"}, {"inf": "set", "past_raw": "set", "pp_raw": "set", "past": "set", "pp": "set", "es": "poner / establecer", "ca": "posar / establir", "ka": "დაყენება / დაყენება-ჩაყენება"}, {"inf": "sew", "past_raw": "sewed", "pp_raw": "sewn/sewed", "past": "sewed", "pp": "sewn", "es": "coser", "ca": "cosir", "ka": "კერვა"}, {"inf": "shake", "past_raw": "shook", "pp_raw": "shaken", "past": "shook", "pp": "shaken", "es": "sacudir", "ca": "sacsejar", "ka": "შერყევა"}, {"inf": "shine", "past_raw": "shone", "pp_raw": "shone", "past": "shone", "pp": "shone", "es": "brillar", "ca": "brillar", "ka": "ბრწყინვა"}, {"inf": "shoot", "past_raw": "shot", "pp_raw": "shot", "past": "shot", "pp": "shot", "es": "disparar", "ca": "disparar", "ka": "სროლა"}, {"inf": "show", "past_raw": "showed", "pp_raw": "shown/showed", "past": "showed", "pp": "shown", "es": "mostrar", "ca": "mostrar", "ka": "ჩვენება"}, {"inf": "shrink", "past_raw": "shrank/shrunk", "pp_raw": "shrunk", "past": "shrank", "pp": "shrunk", "es": "encoger", "ca": "encongir-se", "ka": "შეკუმშვა / დაპატარავება"}, {"inf": "shut", "past_raw": "shut", "pp_raw": "shut", "past": "shut", "pp": "shut", "es": "cerrar", "ca": "tancar", "ka": "დახურვა"}, {"inf": "sing", "past_raw": "sang", "pp_raw": "sung", "past": "sang", "pp": "sung", "es": "cantar", "ca": "cantar", "ka": "სიმღერა"}, {"inf": "sink", "past_raw": "sank", "pp_raw": "sunk", "past": "sank", "pp": "sunk", "es": "hundirse", "ca": "enfonsar-se", "ka": "ჩაძირვა"}, {"inf": "sit", "past_raw": "sat", "pp_raw": "sat", "past": "sat", "pp": "sat", "es": "sentarse", "ca": "seure", "ka": "ჯდომა"}, {"inf": "sleep", "past_raw": "slept", "pp_raw": "slept", "past": "slept", "pp": "slept", "es": "dormir", "ca": "dormir", "ka": "ძილი"}, {"inf": "slide", "past_raw": "slid", "pp_raw": "slid", "past": "slid", "pp": "slid", "es": "deslizar(se)", "ca": "lliscar", "ka": "სრიალი"}, {"inf": "sow", "past_raw": "sowed", "pp_raw": "sown/sowed", "past": "sowed", "pp": "sown", "es": "sembrar", "ca": "sembrar", "ka": "თესვა"}, {"inf": "speak", "past_raw": "spoke", "pp_raw": "spoken", "past": "spoke", "pp": "spoken", "es": "hablar", "ca": "parlar", "ka": "ლაპარაკი"}, {"inf": "spell", "past_raw": "spelt/spelled", "pp_raw": "spelt/spelled", "past": "spelt", "pp": "spelt", "es": "deletrear", "ca": "lletrejar", "ka": "მარცვლებით დაწერა"}, {"inf": "spend", "past_raw": "spent", "pp_raw": "spent", "past": "spent", "pp": "spent", "es": "gastar / pasar (tiempo)", "ca": "gastar / passar (temps)", "ka": "დახარჯვა"}, {"inf": "spill", "past_raw": "spilt/spilled", "pp_raw": "spilt/spilled", "past": "spilt", "pp": "spilt", "es": "derramar", "ca": "vessar", "ka": "დაღვრა"}, {"inf": "split", "past_raw": "split", "pp_raw": "split", "past": "split", "pp": "split", "es": "dividir / partir", "ca": "dividir / partir", "ka": "გაყოფა"}, {"inf": "spoil", "past_raw": "spoilt/spoiled", "pp_raw": "spoilt/spoiled", "past": "spoilt", "pp": "spoilt", "es": "estropear", "ca": "espatllar", "ka": "გაფუჭება"}, {"inf": "spread", "past_raw": "spread", "pp_raw": "spread", "past": "spread", "pp": "spread", "es": "extender / difundir", "ca": "estendre / escampar", "ka": "გავრცელება"}, {"inf": "stand", "past_raw": "stood", "pp_raw": "stood", "past": "stood", "pp": "stood", "es": "estar de pie", "ca": "estar dret", "ka": "დგომა"}, {"inf": "steal", "past_raw": "stole", "pp_raw": "stolen", "past": "stole", "pp": "stolen", "es": "robar", "ca": "robar", "ka": "ქურდობა"}, {"inf": "sting", "past_raw": "stung", "pp_raw": "stung", "past": "stung", "pp": "stung", "es": "picar", "ca": "picar", "ka": "დაკბენა / ნესტრით ჩხვლეტა"}, {"inf": "stink", "past_raw": "stank/stunk", "pp_raw": "stunk", "past": "stank", "pp": "stunk", "es": "apestar / oler mal", "ca": "fer pudor", "ka": "ყროლა"}, {"inf": "strike", "past_raw": "struck", "pp_raw": "struck", "past": "struck", "pp": "struck", "es": "golpear", "ca": "colpejar", "ka": "დარტყმა"}, {"inf": "swear", "past_raw": "swore", "pp_raw": "sworn", "past": "swore", "pp": "sworn", "es": "jurar", "ca": "jurar", "ka": "ფიცება"}, {"inf": "sweep", "past_raw": "swept", "pp_raw": "swept", "past": "swept", "pp": "swept", "es": "barrer", "ca": "escombrar", "ka": "მოხვეტა"}, {"inf": "swim", "past_raw": "swam", "pp_raw": "swum", "past": "swam", "pp": "swum", "es": "nadar", "ca": "nedar", "ka": "ცურვა"}, {"inf": "take", "past_raw": "took", "pp_raw": "taken", "past": "took", "pp": "taken", "es": "tomar / coger", "ca": "agafar / prendre", "ka": "აღება"}, {"inf": "teach", "past_raw": "taught", "pp_raw": "taught", "past": "taught", "pp": "taught", "es": "enseñar", "ca": "ensenyar", "ka": "სწავლება"}, {"inf": "tear", "past_raw": "tore", "pp_raw": "torn", "past": "tore", "pp": "torn", "es": "rasgar", "ca": "esquinçar", "ka": "დახევა"}, {"inf": "tell", "past_raw": "told", "pp_raw": "told", "past": "told", "pp": "told", "es": "decir / contar", "ca": "dir / explicar", "ka": "მოყოლა / თქმა"}, {"inf": "think", "past_raw": "thought", "pp_raw": "thought", "past": "thought", "pp": "thought", "es": "pensar", "ca": "pensar", "ka": "ფიქრი"}, {"inf": "throw", "past_raw": "threw", "pp_raw": "thrown", "past": "threw", "pp": "thrown", "es": "tirar / lanzar", "ca": "llençar", "ka": "გადაგდება"}, {"inf": "tread", "past_raw": "trode", "pp_raw": "trodden/trod", "past": "trode", "pp": "trodden", "es": "pisar", "ca": "trepitjar", "ka": "ფეხის დადგმა / გათელვა"}, {"inf": "understand", "past_raw": "understood", "pp_raw": "understood", "past": "understood", "pp": "understood", "es": "entender", "ca": "entendre", "ka": "გაგება"}, {"inf": "wake", "past_raw": "woke", "pp_raw": "woken", "past": "woke", "pp": "woken", "es": "despertar(se)", "ca": "despertar(-se)", "ka": "გაღვიძება"}, {"inf": "wear", "past_raw": "wore", "pp_raw": "worn", "past": "wore", "pp": "worn", "es": "llevar puesto / vestir", "ca": "portar (roba) / vestir", "ka": "ტარება / ჩაცმა"}, {"inf": "weave", "past_raw": "wove", "pp_raw": "woven", "past": "wove", "pp": "woven", "es": "tejer", "ca": "teixir", "ka": "ქსოვა"}, {"inf": "weep", "past_raw": "wept", "pp_raw": "wept", "past": "wept", "pp": "wept", "es": "llorar", "ca": "plorar", "ka": "ტირილი"}, {"inf": "win", "past_raw": "won", "pp_raw": "won", "past": "won", "pp": "won", "es": "ganar", "ca": "guanyar", "ka": "მოგება"}, {"inf": "wring", "past_raw": "wrung", "pp_raw": "wrung", "past": "wrung", "pp": "wrung", "es": "retorcer / escurrir", "ca": "torçar / escórrer", "ka": "გამოწურვა"}, {"inf": "write", "past_raw": "wrote", "pp_raw": "written", "past": "wrote", "pp": "written", "es": "escribir", "ca": "escriure", "ka": "წერა"}];
@@ -586,6 +982,13 @@ const UI = {
     meaningCol: "Significat",
     searchPh: "Cerca (infinitiu / formes / significat)...",
     close: "Tancar",
+    statsTitle: "Estadístiques",
+    statsTabs: { levels: "Per nivell", difficult: "Difícils", rounds: "Per rondes" },
+    statsLevelsHead: { level:"Nivell", mastered:"Dominats", pct:"% Dominats", correct:"Encerts", wrong:"Errors", rounds:"Rondes" },
+    statsDiffEmpty: "Encara no hi ha errors registrats.",
+    statsDiffErrors: "errors",
+    statsRoundsHead: { level:"Nivell", round:"Ronda actual", accRound:"Precisió (ronda)", accTotal:"Precisió total", delta:"Δ millora" },
+    statsRoundsNote: "“Ronda actual” és el número de ronda del nivell. Reiniciar inicia una nova ronda però guarda l’històric per veure l’evolució.",
     colors: {
       label: "Colors:",
       easy: "Fàcils (3 iguals)",
@@ -661,6 +1064,13 @@ const UI = {
     meaningCol: "Significado",
     searchPh: "Buscar (infinitivo / formas / significado)...",
     close: "Cerrar",
+    statsTitle: "Estadísticas",
+    statsTabs: { levels: "Por nivel", difficult: "Difíciles", rounds: "Por rondas" },
+    statsLevelsHead: { level:"Nivel", mastered:"Dominados", pct:"% Dominados", correct:"Aciertos", wrong:"Errores", rounds:"Rondas" },
+    statsDiffEmpty: "Aún no hay errores registrados.",
+    statsDiffErrors: "errores",
+    statsRoundsHead: { level:"Nivel", round:"Ronda actual", accRound:"Precisión (ronda)", accTotal:"Precisión total", delta:"Δ mejora" },
+    statsRoundsNote: "“Ronda actual” es el número de ronda del nivel. Reiniciar inicia una nueva ronda pero guarda el histórico para ver la evolución.",
     colors: { label:"Colores:", easy:"Fáciles (3 iguales)", mid:"Medios (2 iguales)", hard:"Difíciles (3 diferentes)" },
     meaningHeader: "Castellano"
   },
@@ -731,6 +1141,13 @@ const UI = {
     meaningCol: "მნიშვნელობა",
     searchPh: "ძებნა (infinitive / forms / meaning)...",
     close: "დახურვა",
+    statsTitle: "სტატისტიკა",
+    statsTabs: { levels: "დონეებით", difficult: "რთულები", rounds: "რონდებით" },
+    statsLevelsHead: { level:"დონე", mastered:"დამახსოვრებული", pct:"% დამახსოვრებული", correct:"სწორი", wrong:"შეცდომა", rounds:"რონდები" },
+    statsDiffEmpty: "ჯერჯერობით შეცდომები არ არის.",
+    statsDiffErrors: "შეცდომა",
+    statsRoundsHead: { level:"დონე", round:"მიმდინარე რონდა", accRound:"სიზუსტე (რონდა)", accTotal:"სიზუსტე სულ", delta:"Δ გაუმჯობესება" },
+    statsRoundsNote: "„მიმდინარე რონდა“ არის ამ დონის რონდის ნომერი. გადატვირთვა იწყებს ახალ რონდას, მაგრამ ინახავს ისტორიას პროგრესის სანახავად.",
     colors: { label:"ფერები:", easy:"მარტივი (3 ერთნაირი)", mid:"საშუალო (2 ერთნაირი)", hard:"რთული (3 განსხვავებული)" },
     meaningHeader: "მნიშვნელობა"
   }
@@ -762,6 +1179,7 @@ const els = {
   btnReset: document.getElementById("btnReset"),
   btnList: document.getElementById("btnList"),
   btnHelp: document.getElementById("btnHelp"),
+  btnStats: document.getElementById("btnStats"),
   btnSpeak: document.getElementById("btnSpeak"),
   btnStar: document.getElementById("btnStar"),
   studyControls: document.getElementById("studyControls"),
@@ -785,6 +1203,7 @@ levelTitle: document.getElementById("levelTitle"),
   qTotal: document.getElementById("qTotal"),
   progressBar: document.getElementById("progressBar"),
   progressPct: document.getElementById("progressPct"),
+  progressRemain: document.getElementById("progressRemain"),
   scoreLine: document.getElementById("scoreLine"),
   masterLine: document.getElementById("masterLine"),
   modal: document.getElementById("modal"),
@@ -819,6 +1238,42 @@ levelTitle: document.getElementById("levelTitle"),
   tensePPLbl: document.getElementById('tensePPLbl')
 };
 
+/* --- Mobile layout helper: split question text into main + parentheses spans --- */
+function normalizeQuestionText(){
+  const qt = els.questionText;
+  if(!qt) return;
+  if(qt.querySelector(".qMain")) return;
+
+  // Capture existing nodes
+  let main = "";
+  let paren = "";
+  qt.childNodes.forEach(n=>{
+    if(n.nodeType === 3){ main += n.textContent; }
+    else if(n.nodeType === 1){
+      if(n.classList.contains("tenseSmall")) paren = n.textContent;
+      else main += n.textContent;
+    }
+  });
+
+  main = (main || "").replace(/\s+/g," ").trim();
+  paren = (paren || "").trim();
+
+  qt.innerHTML = "";
+  const sMain = document.createElement("span");
+  sMain.className = "qMain";
+  sMain.textContent = main || "";
+  qt.appendChild(sMain);
+
+  if(paren){
+    const sParen = document.createElement("span");
+    sParen.className = "qParen tenseSmall";
+    sParen.textContent = paren;
+    qt.appendChild(sParen);
+  }
+}
+
+
+
 // FIX49: Move tense filter box to the LEFT under "Nivell" header (only in Level 3)
 let __tenseFiltersHome = null;
 function placeTenseFilters(lvl){
@@ -845,10 +1300,12 @@ function placeTenseFilters(lvl){
     if(titleEl && titleEl.parentElement !== topRow) topRow.appendChild(titleEl);
     if(resetBtn && resetBtn.parentElement !== topRow) topRow.appendChild(resetBtn);
 
-    // Place filters UNDER the top row (LEFT)
-    if(tf.parentElement !== els.levelHeaderLeft) els.levelHeaderLeft.appendChild(tf);
-    // Ensure it's after the topRow
-    if(els.levelHeaderLeft.lastElementChild !== tf) els.levelHeaderLeft.appendChild(tf);
+    // FIX: En mòbil, col·loca els filtres dins del quizHeaderGrid directament
+    const isMobile = window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
+    const targetParent = isMobile ? els.quizHeaderGrid : els.levelHeaderLeft;
+    
+    if(tf.parentElement !== targetParent) targetParent.appendChild(tf);
+    if(!isMobile && els.levelHeaderLeft.lastElementChild !== tf) els.levelHeaderLeft.appendChild(tf);
 
   } else {
     els.levelHeaderLeft.classList.remove("lvl3LeftCol");
@@ -859,7 +1316,6 @@ function placeTenseFilters(lvl){
     tf.classList.add("hidden");
 
     if(topRow){
-      // restore title/reset back directly into left header
       if(titleEl) els.levelHeaderLeft.insertBefore(titleEl, els.levelHeaderLeft.firstChild);
       if(resetBtn) els.levelHeaderLeft.insertBefore(resetBtn, titleEl ? titleEl.nextSibling : els.levelHeaderLeft.firstChild);
       topRow.remove();
@@ -904,6 +1360,10 @@ function initialState() {
     retries,
     stars,
     favOnly,
+    rounds: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 },
+    errByKey: { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{} },
+    // Historical per-level rounds (archived on reset). Each item: {round, endedAt, correct, wrong, mastered, errByKey}
+    history: { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] },
     qPos: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 },
     levelCompleteShown: { 1:false, 2:false, 3:false, 4:false, 5:false, 6:false }
   };
@@ -921,6 +1381,9 @@ function loadState() {
     if(!st.tenseSel) st.tenseSel = initialState().tenseSel;
     if(!st.stars) st.stars = initialState().stars;
     if(!st.favOnly) st.favOnly = initialState().favOnly;
+    if(!st.rounds) st.rounds = initialState().rounds;
+    if(!st.errByKey) st.errByKey = initialState().errByKey;
+    if(!st.history) st.history = initialState().history;
     for (const lvl of [1,2,3,4,5,6]) {
       st.progress[lvl] = st.progress[lvl] || { mastered: {}, correct: 0, wrong: 0 };
       st.progress[lvl].mastered = st.progress[lvl].mastered || {};
@@ -929,6 +1392,10 @@ function loadState() {
       st.retries[lvl] = Array.isArray(st.retries[lvl]) ? st.retries[lvl] : [];
       st.stars[lvl] = st.stars[lvl] || {};
       st.favOnly[lvl] = !!st.favOnly[lvl];
+      st.rounds[lvl] = (st.rounds && st.rounds[lvl]) ? st.rounds[lvl] : 1;
+      st.errByKey[lvl] = (st.errByKey && st.errByKey[lvl]) ? st.errByKey[lvl] : {};
+      if(!st.history) st.history = initialState().history;
+      st.history[lvl] = Array.isArray(st.history[lvl]) ? st.history[lvl] : [];
     }
     // Sempre iniciem sense nivell seleccionat (però mantenim el progrés guardat)
     st.currentLevel = null;
@@ -1045,6 +1512,20 @@ function applyLanguage(){
     els.questionText.textContent = UI[lang].selectLevelToStart;
     els.questionHint.textContent = "";
   }
+
+  // Stats modal UI
+  const st = document.getElementById("statsTitle");
+  if(st) st.textContent = UI[lang].statsTitle || "📊";
+  const stCloseBtn = document.getElementById("statsCloseBtn");
+  if(stCloseBtn) stCloseBtn.textContent = UI[lang].close;
+  const stCloseX = document.getElementById("statsCloseX");
+  if(stCloseX) stCloseX.setAttribute("aria-label", UI[lang].close);
+  document.querySelectorAll(".statsTabBtn").forEach(b=>{
+    const tab = b.dataset.tab;
+    const map = UI[lang].statsTabs || {};
+    if(map && map[tab]) b.textContent = map[tab];
+  });
+
   syncTopButtonsWidth();
 
   syncTenseFiltersUI();
@@ -1187,6 +1668,9 @@ try{ applyLevelMode(); }catch(e){};
 
       setStarred(lvl, state.currentKey, !cur);
 
+      // Note: 'Només ⭐' affects the NEXT round only.
+      // Changing ⭐ during a round does not remove items already in the current pool.
+
       // Auto-reset if none starred remains (always)
       ensureStarsNotEmpty(lvl);
       saveState();
@@ -1202,12 +1686,15 @@ try{ applyLevelMode(); }catch(e){};
       setFavOnly(lvl, els.chkFavOnly.checked);
       saveState();
       syncStudyControlsUI();
-      // Do not change current question (B:1). Only affects future pool.
-      if(lvl){
-        state.queue = buildQueueForLevel(lvl);
-        saveState();
-        updateStatsUI();
-      }
+
+      // Update counters/progress immediately when toggling "Només ⭐"
+      try{
+        // Question total (does not rebuild the current queue mid-round)
+        const baseTotal = (getPracticeTotal(lvl) || getLevelTotal(lvl));
+        if(els.qTotal) els.qTotal.textContent = String(baseTotal);
+      }catch(e){}
+      try{ updateProgress(lvl); }catch(e){}
+      try{ updateStatsUI(); }catch(e){}
     });
   }
   if(els.btnResetStars){
@@ -1221,6 +1708,8 @@ try{ applyLevelMode(); }catch(e){};
       syncStudyControlsUI();
       // refresh pool for future
       state.queue = buildQueueForLevel(lvl);
+  state.roundSnap = state.roundSnap || {};
+  state.roundSnap[lvl] = { favOnly: isFavOnly(lvl), tenses: (lvl===3 ? getActiveTenses().slice() : null), total: state.queue.length };
       saveState();
       updateStatsUI();
     });
@@ -1232,6 +1721,93 @@ try{ applyLevelMode(); }catch(e){};
 
 let state = loadState();
 function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+// --- Stats helpers ---
+function ensureRound(lvl){
+  if(!state.rounds) state.rounds = {1:1,2:1,3:1,4:1,5:1,6:1};
+  if(!state.rounds[lvl]) state.rounds[lvl] = 1;
+}
+function ensureHistory(){
+  if(!state.history) state.history = {1:[],2:[],3:[],4:[],5:[],6:[]};
+  for(const lvl of [1,2,3,4,5,6]){
+    if(!Array.isArray(state.history[lvl])) state.history[lvl] = [];
+  }
+}
+function noteWrong(lvl, key){
+  if(!key) return;
+  if(!state.errByKey) state.errByKey = {1:{},2:{},3:{},4:{},5:{},6:{}};
+  if(!state.errByKey[lvl]) state.errByKey[lvl] = {};
+  state.errByKey[lvl][key] = (state.errByKey[lvl][key]||0) + 1;
+}
+function archiveRoundIfAny(lvl){
+  // Save current round stats into history before resetting (so stats modal can show evolution).
+  ensureRound(lvl);
+  ensureHistory();
+
+  const prog = state.progress && state.progress[lvl] ? state.progress[lvl] : {mastered:{},correct:0,wrong:0};
+  const mastered = Object.keys(prog.mastered||{}).length;
+  const c = prog.correct||0;
+  const w = prog.wrong||0;
+  const err = (state.errByKey && state.errByKey[lvl]) ? state.errByKey[lvl] : {};
+
+  // Only archive if there was any activity in the round (otherwise avoid empty rows)
+  const hasActivity = mastered>0 || c>0 || w>0 || Object.keys(err).length>0;
+  if(!hasActivity) return;
+
+  state.history[lvl].push({
+    round: state.rounds[lvl] || 1,
+    endedAt: Date.now(),
+    mastered,
+    correct: c,
+    wrong: w,
+    errByKey: err
+  });
+
+  // keep history bounded (avoid unbounded localStorage growth)
+  const MAX = 50;
+  if(state.history[lvl].length > MAX){
+    state.history[lvl] = state.history[lvl].slice(state.history[lvl].length - MAX);
+  }
+}
+function resetRoundStats(lvl){
+  // called when user resets a level (new round)
+  ensureRound(lvl);
+
+  // archive current round BEFORE increment & clear
+  archiveRoundIfAny(lvl);
+
+  state.rounds[lvl] = (state.rounds[lvl]||1) + 1;
+  if(!state.errByKey) state.errByKey = {1:{},2:{},3:{},4:{},5:{},6:{}};
+  state.errByKey[lvl] = {};
+}
+function getRounds(lvl){
+  ensureRound(lvl);
+  return state.rounds[lvl] || 1;
+}
+function getHistory(lvl){
+  ensureHistory();
+  return state.history[lvl] || [];
+}
+function aggregateErrMap(){
+  // combine current + history errors into one map per level
+  ensureHistory();
+  const out = {1:{},2:{},3:{},4:{},5:{},6:{}};
+  for(const lvl of [1,2,3,4,5,6]){
+    const add=(m)=>{
+      for(const k of Object.keys(m||{})){
+        out[lvl][k] = (out[lvl][k]||0) + (m[k]||0);
+      }
+    };
+    // history
+    for(const r of (state.history[lvl]||[])){
+      add(r.errByKey||{});
+    }
+    // current round
+    add((state.errByKey && state.errByKey[lvl]) ? state.errByKey[lvl] : {});
+  }
+  return out;
+}
+
 
 function isStarred(lvl, key){
   const map = (state.stars && state.stars[lvl]) ? state.stars[lvl] : {};
@@ -1252,10 +1828,30 @@ function countStarredInfs(lvl){
   }
   return n;
 }
-function masteredFromStars(lvl){
+
+function dominatedStarsStats(lvl){
+  // "Dominats" = verbs that are NOT starred (⭐ desmarcades) => excluded from practice
   const total = allInfs().length;
-  const remaining = countStarredInfs(lvl); // starred = pending
-  const mastered = Math.max(0, Math.min(total, total - remaining));
+  const starred = countStarredInfs(lvl);
+  const unstarred = Math.max(0, total - starred);
+  return { unstarred, starred, total };
+}
+
+function masteredFromStars(lvl){
+  // For levels 1/2/4/5/6: ⭐ means "included in practice" (active).
+  // We want mastered/total relative to the active set, not the full 118.
+  const all = allInfs();
+  const masteredObj = (state.progress && state.progress[lvl] && state.progress[lvl].mastered) ? state.progress[lvl].mastered : {};
+  let total = 0;
+  let mastered = 0;
+  for(const inf of all){
+    const key = makeMasterKey(lvl, inf, "inf");
+    if(isStarred(lvl, key)){
+      total++;
+      if(!!masteredObj[inf] || !!masteredObj[key]) mastered++; // support both key styles
+    }
+  }
+  const remaining = Math.max(0, total - mastered);
   return { mastered, total, remaining };
 }
 function allQuestionKeysForLevel(lvl){
@@ -1335,6 +1931,15 @@ function pct(n,d){ if(d<=0) return 0; return Math.round((n/d)*100); }
 function allInfs(){ return DEFAULT_VERBS.map(v=>v.inf); }
 function getVerb(inf){ return DEFAULT_VERBS.find(v=>v.inf===inf); }
 
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, (m)=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]));
+}
+function getVerbByKey(key){
+  const inf = String(key).includes("|") ? String(key).split("|")[0] : String(key);
+  return getVerb(inf);
+}
+
+
 function getActiveTenses(){
   if(state.currentLevel!==3) return ["inf"];
   const sel = state.tenseSel || {inf:true,past:false,pp:false};
@@ -1344,6 +1949,22 @@ function getActiveTenses(){
   if(sel.pp) t.push("pp");
   return t.length ? t : ["inf"];
 }
+
+function buildPracticeUniverseForLevel3(tensesOverride, favOnlyOverride){
+  const all = allInfs();
+  const tenses = Array.isArray(tensesOverride) && tensesOverride.length ? tensesOverride : getActiveTenses();
+  ensureStarsNotEmpty(3);
+  const favOnly = (typeof favOnlyOverride === "boolean") ? favOnlyOverride : isFavOnly(3);
+  const items = [];
+  for(const inf of all){
+    for(const t of tenses){
+      const key = makeMasterKey(3, inf, t);
+      if(!favOnly || isStarred(3, key)) items.push(`${inf}|${t}`);
+    }
+  }
+  return items;
+}
+
 function tenseLabel(t){
   const u = UI[getLang()];
   if(t==="past") return u.tensePast;
@@ -1402,6 +2023,25 @@ function countMastered(lvl){
   }).length;
 }
 
+
+// Round snapshot helpers: a round uses a fixed pool (and fixed filters) until it finishes.
+// Changing ⭐ or "Només ⭐" during a round affects the NEXT round only.
+function getRoundSnap(lvl){
+  return (state.roundSnap && state.roundSnap[lvl]) ? state.roundSnap[lvl] : null;
+}
+function roundFavOnly(lvl){
+  const s = getRoundSnap(lvl);
+  return s ? !!s.favOnly : isFavOnly(lvl);
+}
+function roundTenses(lvl){
+  const s = getRoundSnap(lvl);
+  return (s && Array.isArray(s.tenses) && s.tenses.length) ? s.tenses : getActiveTenses();
+}
+function getRoundTotal(lvl){
+  const s = getRoundSnap(lvl);
+  return (s && typeof s.total === "number" && s.total > 0) ? s.total : (getPracticeTotal(lvl) || getLevelTotal(lvl));
+}
+
 function isLevelUnlocked(lvl){
   return true; // tots els nivells disponibles
 }
@@ -1434,12 +2074,12 @@ function updateStatsUI(){
   // qTotal (footer) can respect ⭐ filter (practice set).
   const practiceTotal = getPracticeTotal(lvl||1) || allInfs().length;
 
-  // FIX21:
-  // - If "Només ⭐" is ON: progress/mastered is based on ⭐ remaining (unstarred = already known).
-  // - If "Només ⭐" is OFF: progress/mastered is based ONLY on correct answers in this level run (state.progress[lvl].mastered).
-  const total = allInfs().length;
-  const favOn = !!(lvl && getFavOnly(lvl));
-  const mt = favOn ? masteredFromStars(lvl||1) : null;
+  // Progress:
+  // - The progress BAR shows % of correct answers over total questions to be completed in this round.
+  //   Total questions = roundTotal + wrong (each error adds one extra repetition).
+  // - "Dominats" shows ⭐ desmarcades / total verbs (independent of "Només ⭐").
+  const totalVerbs = allInfs().length;
+  const dom = dominatedStarsStats(lvl||1);
 
   // keep question total in sync (especially for level 3 with tense filters)
   if(lvl && els.qTotal) els.qTotal.textContent = practiceTotal;
@@ -1448,65 +2088,29 @@ function updateStatsUI(){
     // cap nivell seleccionat encara
     els.progressBar.style.width = `0%`;
     els.progressPct.textContent = `0%`;
+    if(els.progressRemain) els.progressRemain.textContent = ``;
     els.scoreLine.textContent = UI[getLang()].correctWrong(0,0);
-    els.masterLine.textContent = UI[getLang()].masteredLine(0, total);
+    els.masterLine.textContent = UI[getLang()].masteredLine(0, totalVerbs);
         if(els.btnReset) els.btnReset.disabled = true;
     updateLevelButtons();
     return;
   }
 
-  const mastered = favOn ? mt.mastered : Math.max(0, Math.min(total, Object.keys((state.progress[lvl] && state.progress[lvl].mastered) || {}).length));
-  const p = pct(mastered, total);
-  els.progressBar.style.width = `${p}%`;
-  els.progressPct.textContent = `${p}%`;
-  els.scoreLine.textContent = UI[getLang()].correctWrong(state.progress[lvl].correct, state.progress[lvl].wrong);
-  els.masterLine.textContent = UI[getLang()].masteredLine(mastered, total);
-  // Si nivell completat, mostra modal amb opcions (una sola vegada)
-  if(mastered >= total){
-    els.btnNext.disabled = true;
-    // fixa comptador de pregunta a total
-    state.qPos[lvl] = total;
-    els.qIndex.textContent = total;
-    if(!state.levelCompleteShown[lvl]){
-      state.levelCompleteShown[lvl] = true;
-      saveState();
-      openModal(UI[getLang()].levelCompleteTitle, `
-        <p>${UI[getLang()].levelCompleteBody(lvl)}</p>
-        <div class="mt-4 flex gap-2 justify-end">
-          <button id="btnResetLevelFromComplete" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 transition">${UI[getLang()].resetThisLevelBtn}</button>
-          <button id="btnNextLevelFromComplete" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">${UI[getLang()].nextLevelBtn}</button>
-        </div>
-      `, { showOk: false });
-      setTimeout(()=>{
-        const a=document.getElementById("btnResetLevelFromComplete");
-        const b=document.getElementById("btnNextLevelFromComplete");
-        if(a) a.onclick = ()=>{
-          // reinicia nivell actual
-          state.progress[lvl] = { mastered: {}, correct: 0, wrong: 0 };
-          state.retries[lvl] = [];
-          state.queue = [];
-          state.current = null;
-          state.answered = false;
-          state.qPos[lvl] = 0;
-          state.levelCompleteShown[lvl] = false;
-          saveState();
-          closeModal();
-          startLevel(lvl);
-          updateStatsUI();
-        };
-        if(b) b.onclick = ()=>{
-          const next = Math.min(lvl + 1, 6);
-          closeModal();
-          startLevel(next);
-        };
-      },0);
-    }
-  } else {
-    state.levelCompleteShown[lvl] = false;
-  }
+  const prog = state.progress[lvl] || { mastered:{}, correct:0, wrong:0 };
+  const roundTotal = (getPracticeTotal(lvl) || getLevelTotal(lvl));
+  const denom = roundTotal + (prog.wrong||0);
+  const pctDone = denom>0 ? Math.round(100*(prog.correct||0)/denom) : 0;
+
+  els.progressBar.style.width = `${pctDone}%`;
+  const remaining = Math.max(0, denom - (prog.correct||0));
+
+    els.progressPct.textContent = `${pctDone}%`;
+  if(els.progressRemain) els.progressRemain.textContent = denom>0 ? `(${(prog.correct||0)}/${denom})` : ``;
+  els.scoreLine.textContent = UI[getLang()].correctWrong(prog.correct||0, prog.wrong||0);
+  // "Dominats" = ⭐ desmarcades / total verbs
+  els.masterLine.textContent = UI[getLang()].masteredLine(dom.unstarred, dom.total);
 
   // habilita/deshabilita "Reinicia" només si hi ha progrés en aquest nivell
-  const prog = state.progress[lvl];
   const hasAny = (prog.correct > 0) || (prog.wrong > 0) || (prog.mastered && Object.keys(prog.mastered).length > 0);
   if(els.btnReset) els.btnReset.disabled = !hasAny;
   updateLevelButtons();
@@ -1544,6 +2148,8 @@ function canSpeak(){
 }
 
 function isAutoAudio(){
+  const sel = document.getElementById('audioModeSel');
+  if(sel && sel.value) return sel.value === 'auto';
   return (state.audioMode || 'auto') === 'auto';
 }
 // Speak multiple texts sequentially (skips falsy)
@@ -1584,6 +2190,21 @@ function speakEN(text){
     u.rate = 0.95;
     window.speechSynthesis.speak(u);
   } catch(e){}
+}
+
+function getVoice(){
+  try{
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    return voices.find(v=> (v.lang||"").toLowerCase().startsWith("en")) || null;
+  }catch(e){
+    return null;
+  }
+}
+
+function hasEnglishVoice(){
+  const voices = window.speechSynthesis.getVoices?.() || [];
+  return voices.some(v=> (v.lang||"").toLowerCase().startsWith("en"));
+}
 
 // FIX35: speak the tense asked in the QUESTION (dynamic at click time to avoid stale handlers)
 function speakQuestionTense(){
@@ -1620,7 +2241,6 @@ function speakQueue(texts){
       window.speechSynthesis.speak(u);
     }catch(e){}
   }
-}
 }
 
 // FIX24: small audio button for correct answers
@@ -1885,6 +2505,18 @@ function makeLevel5Pool(v){
 /* Wrong answers return at end (shuffled) */
 function addRetry(item){
   const lvl = state.currentLevel;
+  // If "only ⭐" is active, never retry items that are not starred anymore.
+  if(isFavOnly(lvl)){
+    if(lvl===3){
+      const parsed = parseQueueItem(lvl, item);
+      const qKey = makeMasterKey(lvl, parsed.inf, parsed.tense);
+      if(!isStarred(lvl, qKey)) return;
+    } else {
+      const inf = String(item);
+      const qKey = makeMasterKey(lvl, inf, "inf");
+      if(!isStarred(lvl, qKey)) return;
+    }
+  }
   const list = state.retries[lvl] || [];
   if(!list.includes(item)) list.push(item);
   state.retries[lvl] = list;
@@ -1973,6 +2605,7 @@ function renderMCQ(options, correct, onCorrect){
         if(correctBtn) correctBtn.classList.add("optReveal");
         setFeedback(UI[getLang()].notCorrect, false);
         state.progress[state.currentLevel].wrong += 1;
+        noteWrong(state.currentLevel, state.currentKey || state.current.inf);
         addRetry(state.currentKey || state.current.inf);
         wiggle();
       }
@@ -2004,6 +2637,7 @@ function maybeFinishLevel(){
         const r=document.getElementById("btnResetAfterComplete");
         if(r) r.onclick = ()=>{
           // Reinicia NOMÉS aquest nivell i torna a començar
+          resetRoundStats(lvl);
           state.progress[lvl] = { mastered: {}, correct: 0, wrong: 0 };
           state.retries[lvl] = [];
           state.queue = [];
@@ -2058,16 +2692,77 @@ function buildQueueForLevel(lvl){
 
     const notMastered = safeAll.filter(k=>!masteredSet[k]);
     const mastered = safeAll.filter(k=>!!masteredSet[k]);
-    const pool = shuffle(notMastered.concat(shuffle(mastered).slice(0, Math.min(20, mastered.length))));
+    const pool = shuffle(notMastered.concat(shuffle(mastered)));
     return pool.length ? pool : shuffle(safeAll);
   }
 
   const safeAll = favOnly ? all.filter(inf=>isStarred(lvl, makeMasterKey(lvl, inf, "inf"))) : all;
   const notMastered = safeAll.filter(inf=>!masteredSet[inf]);
   const mastered = safeAll.filter(inf=>!!masteredSet[inf]);
-  const pool = shuffle(notMastered.concat(shuffle(mastered).slice(0, Math.min(10, mastered.length))));
+  const pool = shuffle(notMastered.concat(shuffle(mastered)));
   return pool.length ? pool : shuffle(safeAll.length ? safeAll : all);
 }
+
+function buildNotMasteredQueueForLevel(lvl){
+  const all = allInfs();
+  const masteredSet = state.progress[lvl].mastered || {};
+  ensureStarsNotEmpty(lvl);
+  const favOnly = isFavOnly(lvl);
+
+  if(lvl===3){
+    const tenses = getActiveTenses();
+    const safeAll = [];
+    for(const inf of all){
+      for(const t of tenses){
+        const qKey = makeMasterKey(lvl, inf, t);
+        if(!favOnly || isStarred(lvl, qKey)){
+          safeAll.push(`${inf}|${t}`);
+        }
+      }
+    }
+    const notMastered = safeAll.filter(k=>!masteredSet[k]);
+    return shuffle(notMastered);
+  }
+
+  const safeAll = favOnly ? all.filter(inf=>isStarred(lvl, makeMasterKey(lvl, inf, "inf"))) : all;
+  const notMastered = safeAll.filter(inf=>!masteredSet[inf]);
+  return shuffle(notMastered);
+}
+
+function prunePoolsForLevel(lvl){
+  const favOnly = isFavOnly(lvl);
+  if(!favOnly) return;
+  const keep = (item)=>{
+    if(!item) return false;
+    if(lvl===3){
+      const parsed = parseQueueItem(lvl, item);
+      const qKey = makeMasterKey(lvl, parsed.inf, parsed.tense);
+      return isStarred(lvl, qKey);
+    } else {
+      const inf = String(item);
+      const qKey = makeMasterKey(lvl, inf, "inf");
+      return isStarred(lvl, qKey);
+    }
+  };
+  state.queue = (state.queue || []).filter(keep);
+  const r = state.retries[lvl] || [];
+  state.retries[lvl] = r.filter(keep);
+}
+
+function showRoundFinishedModal(lvl){
+  const lang = getLang();
+  const titles = { ca:"Partida acabada!", es:"¡Partida terminada!", en:"Round completed!" , ka:"Round completed!" };
+  const body1 = { ca:"Has completat tots els verbs seleccionats per aquesta ronda.",
+                  es:"Has completado todos los verbos seleccionados de esta ronda.",
+                  en:"You completed all selected verbs for this round.",
+                  ka:"You completed all selected verbs for this round." };
+  const body2 = { ca:"Pots reiniciar per començar una nova ronda o canviar filtres (⭐ / temps).",
+                  es:"Puedes reiniciar para empezar una nueva ronda o cambiar filtros (⭐ / tiempos).",
+                  en:"You can reset to start a new round or change filters (⭐ / tenses).",
+                  ka:"You can reset to start a new round or change filters (⭐ / tenses)." };
+  openModal(titles[lang] || titles.en, `<p>${body1[lang]||body1.en}</p><p class="mt-2 text-sm opacity-80">${body2[lang]||body2.en}</p>`);
+}
+
 
 
 function takeNextItem(){
@@ -2081,13 +2776,18 @@ function takeNextItem(){
     saveState();
     return state.queue.shift();
   }
-  state.queue = buildQueueForLevel(lvl);
-  return state.queue.shift();
+
+  // Round finished: no more queued items and no retries.
+  return null;
 }
 
 function nextQuestion(){
   const lvl = state.currentLevel;
   const item = takeNextItem();
+  if(!item){
+    showRoundFinishedModal(lvl);
+    return;
+  }
   const parsed = parseQueueItem(lvl, item);
   const inf = parsed.inf;
   const tense = parsed.tense;
@@ -2107,10 +2807,24 @@ function nextQuestion(){
   setNextEnabled(false);
 
   els.levelTitle.textContent = UI[getLang()].level(lvl);
-  const totalForLvl = getPracticeTotal(lvl) || getLevelTotal(lvl);
+  const totalForLvl = getRoundTotal(lvl);
   els.qTotal.textContent = totalForLvl;
-  state.qPos[lvl] = Math.min((state.qPos[lvl]||0) + 1, totalForLvl);
-  els.qIndex.textContent = state.qPos[lvl];
+
+  // Show progress as "mastered so far + 1" (never exceeds total), instead of raw attempts
+  const prog = state.progress[lvl] || { mastered:{} };
+  let masteredNow = 0;
+  if(lvl===3){
+    const active = buildPracticeUniverseForLevel3(roundTenses(3), roundFavOnly(3));
+    const ms = prog.mastered || {};
+    masteredNow = active.filter(k=>!!ms[k]).length;
+  } else {
+    const ms = prog.mastered || {};
+    const favOn = roundFavOnly(lvl);
+    const all = allInfs();
+    const activeInfs = favOn ? all.filter(inf=>isStarred(lvl, makeMasterKey(lvl, inf, "inf"))) : all;
+    masteredNow = activeInfs.filter(inf=>!!ms[inf]).length;
+  }
+  els.qIndex.textContent = String(Math.min(totalForLvl, masteredNow + 1));
 
   if(lvl===1) return buildLevel1(v);
   if(lvl===2) return buildLevel2(v);
@@ -2123,7 +2837,8 @@ function nextQuestion(){
 function buildLevel1(v){
   els.questionText.textContent = v.inf;
   els.questionHint.textContent = UI[getLang()].hintL1;
-  const pool = DEFAULT_VERBS.map(x=>meaningForLang(x));
+  
+  normalizeQuestionText();const pool = DEFAULT_VERBS.map(x=>meaningForLang(x));
   const correct = meaningForLang(v);
   const options = [correct, ...shuffle(pool.filter(x=>x!==correct)).slice(0,2)];
   renderMCQ(options, correct, ()=>{ state.progress[1].mastered[v.inf]=true; saveState(); updateStatsUI(); });
@@ -2131,7 +2846,8 @@ function buildLevel1(v){
 function buildLevel2(v){
   els.questionText.textContent = meaningForLang(v);
   els.questionHint.textContent = UI[getLang()].hintL2;
-  const pool = allInfs();
+  
+  normalizeQuestionText();const pool = allInfs();
   const correct = v.inf;
   const options = [correct, ...shuffle(pool.filter(x=>x!==correct)).slice(0,2)];
   renderMCQ(options, correct, ()=>{ state.progress[2].mastered[v.inf]=true; saveState(); updateStatsUI(); });
@@ -2149,6 +2865,8 @@ function buildLevel3(v){
   els.questionText.appendChild(tSpan);
   els.questionHint.textContent = UI[getLang()].hintL3;
 
+  
+  normalizeQuestionText();
   els.level3Letters.classList.remove("hidden");
   els.level6Area.classList.add("hidden");
   els.answers.innerHTML = "";
@@ -2236,6 +2954,7 @@ function buildLevel3(v){
       // Count per WORD (not per letter): correct only if no mistakes
       if(state.l3HadMistake){
         state.progress[3].wrong += 1;
+        noteWrong(3, state.currentKey || (state.current && state.current.inf ? makeMasterKey(3, state.current.inf, state.current.tense||'inf') : null));
         setFeedback(UI[getLang()].bad, true);
       } else {
         state.progress[3].correct += 1;
@@ -2252,6 +2971,8 @@ function buildLevel3(v){
 
     saveState(); updateStatsUI();
     setNextEnabled(true);
+    // Auto audio: speak the target word (tense in question) when completed
+    try{ if(isAutoAudio()) speakEN(target); }catch(e){}
     maybeFinishLevel();
   }
 
@@ -2326,7 +3047,8 @@ function buildLevel4(v){
     els.questionText.appendChild(s);
   }
   els.questionHint.textContent = UI[getLang()].hintL4;
-  const { options, correct } = makeLevel3Options(v);
+  
+  normalizeQuestionText();const { options, correct } = makeLevel3Options(v);
   renderMCQ(options, correct, ()=>{ state.progress[3].mastered[v.inf]=true; saveState(); updateStatsUI(); });
 }
 
@@ -2343,11 +3065,17 @@ function buildLevel5(v){
     els.questionText.appendChild(s);
   }
   els.questionHint.textContent = UI[getLang()].hintL5;
-  const { options, correct } = makeLevel4Options(v);
+  
+  normalizeQuestionText();const { options, correct } = makeLevel4Options(v);
   renderMCQ(options, correct, ()=>{ state.progress[4].mastered[v.inf]=true; saveState(); updateStatsUI(); });
 }
 
 function buildLevel6(v){
+  // Reset auto-audio state for level 6 on each new question
+  state.n6LastOk = {inf:false, past:false, pp:false};
+  // New question: allow checking again
+  state.answered = false;
+  if(els.btnCheckLevel6) els.btnCheckLevel6.disabled = false;
   els.questionText.textContent = meaningForLang(v) || v.inf;
   els.questionHint.innerHTML = UI[getLang()].hintL6;
   els.level6Area.classList.remove("hidden");
@@ -2358,9 +3086,7 @@ function buildLevel6(v){
   fillSelect(els.selPast, shuffle(pool));
   fillSelect(els.selPP, shuffle(pool));
 
-  els.selInf.value=""; els.selPast.value=""; els.selPP.value="";
-
-  
+  els.selInf.value=""; els.selPast.value=""; els.selPP.value=""; 
 
   // FIX25: N6 audio buttons pronounce selected value (each tense)
   function syncN6Audio(){
@@ -2377,9 +3103,13 @@ function buildLevel6(v){
   setNextEnabled(false);
 
   // helpers visuals
-  const wrapInf = els.selInf.closest(".bg-white");
-  const wrapPast = els.selPast.closest(".bg-white");
-  const wrapPP = els.selPP.closest(".bg-white");
+  const wrapInf = els.selInf.closest("#level6Area .grid > div");
+  const wrapPast = els.selPast.closest("#level6Area .grid > div");
+  const wrapPP = els.selPP.closest("#level6Area .grid > div");
+  // Reset colors for new question
+  if(wrapInf) wrapInf.className = "bg-white rounded-lg p-2 border";
+  if(wrapPast) wrapPast.className = "bg-white rounded-lg p-2 border";
+  if(wrapPP) wrapPP.className = "bg-white rounded-lg p-2 border";
 
   // FIX54: reset last-ok transitions per question
   state.n6LastOk = { inf:false, past:false, pp:false };
@@ -2416,7 +3146,9 @@ function buildLevel6(v){
     }, { once:false });
   });
 
+
   els.btnCheckLevel6.onclick = ()=>{
+    if(state.answered){ return; }
     const a=els.selInf.value, b=els.selPast.value, c=els.selPP.value;
 
     const hasInf = !!a, hasPast = !!b, hasPP = !!c;
@@ -2427,26 +3159,32 @@ function buildLevel6(v){
     if(!hasInf || !hasPast || !hasPP){
       setFeedback(UI[getLang()].needAllSelects, false);
       wiggle();
+      return;
     }
-
-        // FIX54: auto-audio triggers on GREEN transition (false -> true)
-    const prev = state.n6LastOk || {inf:false,past:false,pp:false};
-    const seq=[];
-    if(okInf && !prev.inf) seq.push(v.inf);
-    if(okPast && !prev.past) seq.push(v.past);
-    if(okPP && !prev.pp) seq.push(v.pp);
 
     setWrap(wrapInf, okInf);
     setWrap(wrapPast, okPast);
     setWrap(wrapPP, okPP);
 
-    state.n6LastOk = { inf:!!okInf, past:!!okPast, pp:!!okPP };
-    try{ if(isAutoAudio() && seq.length) speakQueue(seq); }catch(e){}
     const allOk = okInf && okPast && okPP;
+
+    // N6 Audio: siempre pronunciar TODOS los verbos correctos al hacer clic en "Comprovar"
+    try{
+      if(isAutoAudio()){
+        const toSpeak = [];
+        if(okInf) toSpeak.push(v.inf);
+        if(okPast) toSpeak.push(v.past);
+        if(okPP) toSpeak.push(v.pp);
+        if(toSpeak.length > 0){
+          speakQueue(toSpeak);
+        }
+      }
+    }catch(e){}
 
     if(allOk){
       // ara sí: marquem com complet i deixem avançar
       state.answered = true;
+      if(els.btnCheckLevel6) els.btnCheckLevel6.disabled = true;
       state.progress[6].correct += 1;
       state.progress[6].mastered[v.inf]=true;
 
@@ -2458,6 +3196,7 @@ function buildLevel6(v){
       // permet reintentar tantes vegades com calgui
       state.answered = false;
       state.progress[6].wrong += 1;
+      noteWrong(6, state.currentKey || (state.current && state.current.inf));
       setFeedback(UI[getLang()].stillNot, false);
       saveState(); updateStatsUI();
       setNextEnabled(false);
@@ -2500,6 +3239,8 @@ function startLevel(lvl){
   syncStudyControlsUI();
   syncStarUI(); }catch(e){}
   state.queue = buildQueueForLevel(lvl);
+  state.roundSnap = state.roundSnap || {};
+  state.roundSnap[lvl] = { favOnly: isFavOnly(lvl), tenses: (lvl===3 ? getActiveTenses().slice() : null), total: state.queue.length };
   state.qPos[lvl] = 0;
   state.levelCompleteShown[lvl] = false;
   state.retries[lvl] = [];
@@ -2540,20 +3281,24 @@ els.btnNext.addEventListener("click", ()=>{
 
 
 function openVerbList(){
-  const rows = DEFAULT_VERBS.map(v=>{
-    const ca = meaningForLang(v) || v.inf;
-    const inf=v.inf, past=v.past, pp=v.pp;
+  // Build table rows (same logic as before)
+  const rowsHtml = DEFAULT_VERBS.map(v=>{
+    const inf = (v.inf||"").trim();
+    const past = (v.past||"").trim();
+    const pp = (v.pp||"").trim();
+
+    const ca = (getLang && typeof getLang==="function")
+      ? (v[getLang()] ?? v.ca ?? v.es ?? v.en ?? "")
+      : (v.ca ?? v.es ?? v.en ?? "");
+
     const eqAll = (inf===past && past===pp);
     const eqInfPast = (inf===past && past!==pp);
     const eqInfPP = (inf===pp && inf!==past);
     const eqPastPP = (past===pp && past!==inf);
 
+    const diff = (eqAll ? "easy" : (eqInfPast||eqInfPP||eqPastPP) ? "mid" : "hard");
+
     function cellClass(kind){
-      // kind: 'inf'|'past'|'pp'
-      // color scheme:
-      // - all equal: green for all three
-      // - exactly two equal: amber for the matching pair, third neutral
-      // - all different: slate for all three (same)
       if(eqAll) return "bg-emerald-100";
       if(eqInfPast){
         if(kind==="inf"||kind==="past") return "bg-yellow-100";
@@ -2570,7 +3315,8 @@ function openVerbList(){
       return "bg-orange-200";
     }
 
-    return `<tr class="border-b">
+    // Store a normalized search string in a data attr (built later) via JS
+    return `<tr class="border-b" data-diff="${diff}">
       <td class="px-3 py-2 font-mono ${cellClass("inf")}">${inf}</td>
       <td class="px-3 py-2 font-mono ${cellClass("past")}">${past}</td>
       <td class="px-3 py-2 font-mono ${cellClass("pp")}">${pp}</td>
@@ -2578,75 +3324,382 @@ function openVerbList(){
     </tr>`;
   }).join("");
 
-  const page = `<!DOCTYPE html>
-  <html lang="ca"><head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Llista de verbs irregulars</title>
-    <script src="https://cdn.tailwindcss.com"><\/script>
-  </head>
-  <body class="bg-slate-50 text-slate-800 p-4">
-    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow p-4 sm:p-6">
-      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-bold">${UI[getLang()].listTitle}</h1>
-          <p class="text-sm text-slate-500 mt-1">${UI[getLang()].listSubtitle}</p>
-          <p class="text-xs text-slate-500 mt-1">
-            ${UI[getLang()].colors.label} <span class="inline-block px-2 py-0.5 rounded bg-emerald-200">${UI[getLang()].colors.easy}</span>
-            <span class="inline-block px-2 py-0.5 rounded bg-yellow-200 ml-1">${UI[getLang()].colors.mid}</span>
-            <span class="inline-block px-2 py-0.5 rounded bg-orange-100 ml-1">${UI[getLang()].colors.hard}</span>
-          </p>
-        </div>
-        <div class="flex gap-2">
-          <input id="q" class="border rounded-lg px-3 py-2 w-full sm:w-72" placeholder="${UI[getLang()].searchPh}" />
-          <button id="btnClose" class="bg-slate-200 hover:bg-slate-300 rounded-lg px-3 py-2 font-bold">${UI[getLang()].close}</button>
-        </div>
-      </div>
+  const overlay = document.getElementById("verbListModal");
+  const tbody = document.getElementById("verbListTbody");
+  const titleEl = document.getElementById("verbListTitle");
+  const colorsLabelEl = document.getElementById("verbListColorsLabel");
+  const closeBtnEl = document.getElementById("verbListCloseBtn");
+  const closeXEl = document.getElementById("verbListCloseX");
+  const countEl = document.getElementById("verbListCount");
+  const qEl0 = document.getElementById("verbListSearch");
 
-      <div class="mt-4 overflow-auto rounded-xl border">
-        <div class="overflow-x-auto -mx-3 px-3 pb-3"><table class="min-w-full text-sm">
-          <thead class="sticky top-0 bg-slate-100 z-10">
-            <tr class="text-left">
-              <th class="px-3 py-2">Infinitive</th>
-              <th class="px-3 py-2">Simple Past</th>
-              <th class="px-3 py-2">Past Participle</th>
-              <th class="px-3 py-2">${UI[getLang()].meaningHeader}</th>
-            </tr>
-          </thead>
-          <tbody id="tbody">${rows}</tbody>
-        </table></div>
-      </div>
-    </div>
-
-    <script>
-      const q = document.getElementById("q");
-      const tbody = document.getElementById("tbody");
-      const allRows = Array.from(tbody.querySelectorAll("tr"));
-      function norm(s){ return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
-      q.addEventListener("input", ()=>{
-        const term = norm(q.value);
-        allRows.forEach(r=>{
-          const txt = norm(r.textContent);
-          r.style.display = (!term || txt.includes(term)) ? "" : "none";
-        });
-      });
-      document.getElementById("btnClose").addEventListener("click", ()=> window.close());
-    <\/script>
-  </body></html>`;
-
-  const w = window.open("", "_blank");
-  if(!w){
-    openModal("No s'ha pogut obrir", "<p>El navegador ha bloquejat la finestra emergent. Permet pop-ups per aquest fitxer i torna-ho a provar.</p>");
+  if(!overlay || !tbody || !qEl0 || !countEl){
+    openModal("Error", "<p>No s'ha pogut obrir la llista de verbs (falten elements del modal).</p>");
     return;
   }
-  w.document.open();
-  w.document.write(page);
-  w.document.close();
+
+  // Apply translations (keep behavior consistent with current language)
+  const L = (window.UI && typeof getLang==="function" && UI[getLang()]) ? UI[getLang()] : null;
+
+  if(titleEl) titleEl.textContent = (L && L.verbListTitle) ? L.verbListTitle : "Llista de verbs";
+  if(colorsLabelEl) colorsLabelEl.textContent = (L && L.colors && L.colors.label) ? L.colors.label : "Colors:";
+
+  const colorBtns0 = Array.from(overlay.querySelectorAll(".verbColorBtn"));
+  colorBtns0.forEach(btn=>{
+    const f = btn.dataset.filter;
+    if(!L || !L.colors) return;
+    if(f==="easy" && L.colors.easy) btn.textContent = L.colors.easy;
+    if(f==="mid" && L.colors.mid) btn.textContent = L.colors.mid;
+    if(f==="hard" && L.colors.hard) btn.textContent = L.colors.hard;
+  });
+
+  if(closeBtnEl) closeBtnEl.textContent = (L && L.close) ? L.close : "Tancar";
+
+  // Table headers (if available in UI)
+  const thInf = document.getElementById("verbListThInf");
+  const thPast = document.getElementById("verbListThPast");
+  const thPP = document.getElementById("verbListThPP");
+  const thTr = document.getElementById("verbListThTr");
+  if(L && L.table){
+    if(thInf && L.table.inf) thInf.textContent = L.table.inf;
+    if(thPast && L.table.past) thPast.textContent = L.table.past;
+    if(thPP && L.table.pp) thPP.textContent = L.table.pp;
+    if(thTr && (L.table.tr || L.table.translation)) thTr.textContent = (L.table.tr || L.table.translation);
+  }
+
+  qEl0.placeholder = (L && L.searchPh) ? L.searchPh : "Cerca...";
+
+  // Fill table
+  tbody.innerHTML = rowsHtml;
+
+  // Precompute normalized text for searching
+  const norm = (s)=> (s||"").toString().trim().toLowerCase()
+    .normalize("NFD").replace(/\p{Diacritic}/gu,"");
+
+  const trs = Array.from(tbody.querySelectorAll("tr"));
+  trs.forEach(tr=>{
+    tr.dataset.search = norm(tr.textContent);
+  });
+
+  // Reset filters
+  let term = "";
+  const selected = new Set(); // empty => all (same UX as before)
+
+  function applyFilters(){
+    let shown = 0;
+    trs.forEach(tr=>{
+      const d = tr.dataset.diff;
+      const okDiff = (selected.size===0) ? true : selected.has(d);
+      const okTerm = (term==="") ? true : (tr.dataset.search || "").includes(term);
+      const ok = okDiff && okTerm;
+      tr.classList.toggle("hidden", !ok);
+      if(ok) shown++;
+    });
+    countEl.textContent = String(shown);
+  }
+
+  // To avoid accumulating listeners, clone the interactive elements (cheap + safe)
+  const qEl = qEl0.cloneNode(true);
+  qEl0.parentNode.replaceChild(qEl, qEl0);
+
+  const closeBtn = closeBtnEl ? closeBtnEl.cloneNode(true) : null;
+  if(closeBtnEl && closeBtn){
+    closeBtnEl.parentNode.replaceChild(closeBtn, closeBtnEl);
+  }
+  const closeX = closeXEl ? closeXEl.cloneNode(true) : null;
+  if(closeXEl && closeX){
+    closeXEl.parentNode.replaceChild(closeX, closeXEl);
+  }
+
+  const colorBtns = Array.from(overlay.querySelectorAll(".verbColorBtn")).map(b=>{
+    const c = b.cloneNode(true);
+    b.parentNode.replaceChild(c, b);
+    return c;
+  });
+
+  function closeVerbList(){
+    overlay.classList.add("hidden");
+    overlay.classList.remove("flex");
+  }
+
+  if(closeBtn) closeBtn.addEventListener("click", closeVerbList);
+  if(closeX) closeX.addEventListener("click", closeVerbList);
+  overlay.onclick = (ev)=>{ if(ev.target===overlay) closeVerbList(); }; 
+
+  colorBtns.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const key = btn.dataset.filter;
+      if(!key) return;
+
+      if(selected.has(key)){
+        selected.delete(key);
+      } else {
+        selected.add(key);
+        if(selected.size===3){
+          selected.clear(); // all three => reset to "all"
+        }
+      }
+
+      // Visual state
+      colorBtns.forEach(b=>{
+        b.classList.toggle("ring-2", selected.has(b.dataset.filter));
+        b.classList.toggle("ring-slate-400", selected.has(b.dataset.filter));
+      });
+
+      applyFilters();
+    });
+  });
+
+  qEl.addEventListener("input", ()=>{
+    term = norm(qEl.value);
+    applyFilters();
+  });
+
+  // Open modal
+  overlay.classList.remove("hidden");
+  overlay.classList.add("flex");
+  applyFilters();
+  qEl.focus();
 }
 
 
 els.btnList.addEventListener("click", openVerbList);
 
+
+els.btnStats.addEventListener("click", ()=>{
+  openStats();
+});
+
+function openStats(){
+  renderStats();
+  enableStatsDrag();
+  const m = document.getElementById("statsModal");
+  if(m){ m.classList.remove("hidden"); m.classList.add("flex"); }
+}
+function closeStats(){
+  const m = document.getElementById("statsModal");
+  if(m){ m.classList.add("hidden"); m.classList.remove("flex"); }
+}
+
+function setStatsTab(tab){
+  document.querySelectorAll(".statsTabPanel").forEach(p=>{
+    p.classList.toggle("hidden", p.id !== "statsTab_"+tab);
+  });
+  document.querySelectorAll(".statsTabBtn").forEach(b=>{
+    const active = (b.dataset.tab===tab);
+    b.classList.toggle("bg-slate-900", active);
+    b.classList.toggle("text-white", active);
+    b.classList.toggle("bg-slate-200", !active);
+    b.classList.toggle("text-slate-800", !active);
+  });
+}
+
+
+let _statsDragReady = false;
+function enableStatsDrag(){
+  if(_statsDragReady) return;
+  // Only for desktop-like pointers (mouse/trackpad)
+  if(!window.matchMedia || !window.matchMedia("(pointer:fine)").matches) return;
+
+  const overlay = document.getElementById("statsModal");
+  const card = document.getElementById("statsCard");
+  const header = document.getElementById("statsHeader");
+  if(!overlay || !card || !header) return;
+
+  _statsDragReady = true;
+  header.style.cursor = "move";
+
+  // Make the card draggable by positioning it absolutely inside the overlay
+  card.style.position = "absolute";
+  card.style.left = "50%";
+  card.style.top = "50%";
+  card.style.transform = "translate(-50%, -50%)";
+
+  let dragging = false;
+  let startX=0, startY=0, startLeft=0, startTop=0;
+
+  const onDown = (ev)=>{
+    // Ignore clicks on buttons in header (close X etc.)
+    if(ev.target.closest("button")) return;
+    dragging = true;
+    const rect = card.getBoundingClientRect();
+    startX = ev.clientX;
+    startY = ev.clientY;
+    startLeft = rect.left;
+    startTop = rect.top;
+    ev.preventDefault();
+  };
+
+  const clamp = (v, min, max)=>Math.min(max, Math.max(min, v));
+
+  const onMove = (ev)=>{
+    if(!dragging) return;
+    const dx = ev.clientX - startX;
+    const dy = ev.clientY - startY;
+
+    // convert viewport px to left/top within overlay
+    const newLeft = startLeft + dx;
+    const newTop = startTop + dy;
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const rect = card.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    const clLeft = clamp(newLeft, 8, vw - w - 8);
+    const clTop  = clamp(newTop, 8, vh - h - 8);
+
+    card.style.left = clLeft + "px";
+    card.style.top = clTop + "px";
+    card.style.transform = "translate(0,0)";
+  };
+
+  const onUp = ()=>{
+    dragging = false;
+  };
+
+  header.addEventListener("mousedown", onDown);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+
+  // Reset to centered when closing, so it doesn't drift forever
+  const resetPos = ()=>{
+    card.style.left = "50%";
+    card.style.top = "50%";
+    card.style.transform = "translate(-50%, -50%)";
+  };
+  const closeX = document.getElementById("statsCloseX");
+  const closeBtn = document.getElementById("statsCloseBtn");
+  if(closeX) closeX.addEventListener("click", resetPos);
+  if(closeBtn) closeBtn.addEventListener("click", resetPos);
+}
+
+function renderStats(){
+  // summary totals across levels
+  const total = {correct:0, wrong:0, mastered:0, rounds:0};
+  for(const lvl of [1,2,3,4,5,6]){
+    total.correct += (state.progress[lvl]?.correct||0);
+    total.wrong   += (state.progress[lvl]?.wrong||0);
+    total.mastered += Object.keys(state.progress[lvl]?.mastered||{}).length;
+    total.rounds += getRounds(lvl);
+  }
+
+  const tabSum = document.getElementById("statsTab_summary");
+  const tabLvl = document.getElementById("statsTab_levels");
+  const tabDiff = document.getElementById("statsTab_difficult");
+  const tabRounds = document.getElementById("statsTab_rounds");
+
+  if(tabSum){ tabSum.innerHTML = ""; }
+
+  if(tabLvl){
+    const H = UI[getLang()].statsLevelsHead;
+    const total = allInfs().length;
+    const rows = [1,2,3,4,5,6].map(lvl=>{
+      const dom = dominatedStarsStats(lvl);
+      const correct = state.progress[lvl]?.correct||0;
+      const wrong = state.progress[lvl]?.wrong||0;
+      const rounds = getRounds(lvl);
+      const pctDom = dom.total>0 ? Math.round(100*dom.unstarred/dom.total) : 0;
+      return `<tr class="border-t">
+        <td class="py-2 font-bold">N${lvl}</td>
+        <td class="py-2">${dom.unstarred} / ${dom.total}</td>
+        <td class="py-2">${pctDom}%</td>
+        <td class="py-2">${correct}</td>
+        <td class="py-2">${wrong}</td>
+        <td class="py-2">${rounds}</td>
+      </tr>`;
+    }).join("");
+    tabLvl.innerHTML = `
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-left text-slate-500">
+            <th class="py-2">${H.level}</th><th>${H.mastered}</th><th>${H.pct}</th><th>${H.correct}</th><th>${H.wrong}</th><th>${H.rounds}</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  if(tabDiff){
+    // collect top difficult keys across levels (by errors)
+    const items = [];
+    for(const lvl of [1,2,3,4,5,6]){
+      const map = (aggregateErrMap()[lvl]) || {};
+      for(const k of Object.keys(map)){
+        items.push({lvl, key:k, n: map[k]});
+      }
+    }
+    items.sort((a,b)=>b.n-a.n);
+    const top = items.slice(0,20);
+    if(top.length===0){
+      tabDiff.innerHTML = `<p class="text-sm text-slate-600">${UI[getLang()].statsDiffEmpty}</p>`;
+    }else{
+      const li = top.map(it=>{
+        const v = getVerbByKey(it.key);
+        const shown = v ? (v.inf||"") : it.key;
+        return `<li class="flex justify-between gap-3 border rounded-lg p-2">
+          <div><span class="font-bold">N${it.lvl}</span> · <span class="font-mono">${escapeHtml(shown)}</span></div>
+          <div class="text-slate-600">${it.n} ${UI[getLang()].statsDiffErrors}</div>
+        </li>`;
+      }).join("");
+      tabDiff.innerHTML = `<ul class="space-y-2">${li}</ul>`;
+    }
+  }
+
+  if(tabRounds){
+    const RH = UI[getLang()].statsRoundsHead;
+    const rows = [1,2,3,4,5,6].map(lvl=>{
+      const r = getRounds(lvl);
+
+      // current round (since last reset)
+      const c = state.progress[lvl]?.correct||0;
+      const w = state.progress[lvl]?.wrong||0;
+      const accRound = (c+w)>0 ? Math.round(100*c/(c+w)) : 0;
+
+      // totals (history + current)
+      const hist = getHistory(lvl);
+      const totC = hist.reduce((s,x)=>s+(x.correct||0),0) + c;
+      const totW = hist.reduce((s,x)=>s+(x.wrong||0),0) + w;
+      const accTotal = (totC+totW)>0 ? Math.round(100*totC/(totC+totW)) : 0;
+
+      const delta = (totC+totW)>0 ? (accRound - accTotal) : 0;
+      const deltaTxt = (totC+totW)>0 ? `${delta>=0?"+":""}${delta}%` : "—";
+
+      return `<tr class="border-t">
+        <td class="py-2 font-bold">N${lvl}</td>
+        <td class="py-2">${r}</td>
+        <td class="py-2">${accRound}%</td>
+        <td class="py-2 text-slate-600">${accTotal}%</td>
+        <td class="py-2">${deltaTxt}</td>
+      </tr>`;
+    }).join("");
+
+    tabRounds.innerHTML = `
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-left text-slate-500">
+            <th class="py-2">${RH.level}</th><th>${RH.round}</th><th>${RH.accRound}</th><th>${RH.accTotal}</th><th>${RH.delta}</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <p class="mt-3 text-xs text-slate-500">${UI[getLang()].statsRoundsNote}</p>
+    `;
+  }
+
+  // wire tabs/close (once)
+  const closeX = document.getElementById("statsCloseX");
+  const closeBtn = document.getElementById("statsCloseBtn");
+  if(closeX) closeX.onclick = closeStats;
+  if(closeBtn) closeBtn.onclick = closeStats;
+
+  document.querySelectorAll(".statsTabBtn").forEach(b=>{
+    b.onclick = ()=>setStatsTab(b.dataset.tab);
+  });
+  setStatsTab("levels");
+}
 els.btnHelp.addEventListener("click", ()=>{ openModal(UI[getLang()].helpTitle, UI[getLang()].helpBody); });
 els.btnReset.addEventListener("click", ()=>{
   const lvl = state.currentLevel;
@@ -2680,12 +3733,16 @@ els.btnReset.addEventListener("click", ()=>{
     if(c) c.onclick = closeModal;
     if(btn) btn.onclick = ()=>{
       // Reinicia NOMÉS el nivell actual
+      // Reinicia NOMÉS el nivell actual (comença una nova ronda, però es guarda l’històric per estadístiques)
+      resetRoundStats(lvl);
+
       state.progress[lvl] = { mastered: {}, correct: 0, wrong: 0 };
       state.retries[lvl] = [];
       state.queue = [];
       state.current = null;
       state.answered = false;
-
+      if(state.qPos) state.qPos[lvl] = 0;
+      if(state.levelCompleteShown) state.levelCompleteShown[lvl] = false;
       saveState();
       closeModal();
 
@@ -2697,6 +3754,26 @@ els.btnReset.addEventListener("click", ()=>{
   },0);
 });
 
+// Check for English voice on startup
+if("speechSynthesis" in window){
+  window.speechSynthesis.onvoiceschanged = ()=>{
+    if(!hasEnglishVoice()){
+      console.warn("No English voice detected");
+      // Opcional: mostrar avís a l'usuari
+      setTimeout(()=>{
+        const lang = getLang();
+        const msgs = {
+          ca: "⚠️ No s'ha detectat cap veu en anglès al teu dispositiu. La pronunciació pot no funcionar correctament. Instal·la una veu anglesa a la configuració del sistema.",
+          es: "⚠️ No se ha detectado ninguna voz en inglés en tu dispositivo. La pronunciación puede no funcionar correctamente. Instala una voz inglesa en la configuración del sistema.",
+          ka: "⚠️ ინგლისური ხმა არ არის ნაპოვნი. გადადი სისტემის პარამეტრებში და ჩამოტვირთე ინგლისური ხმა."
+        };
+        alert(msgs[lang] || msgs.ca);
+      }, 2000);
+    }
+  };
+  // Trigger voice loading
+  window.speechSynthesis.getVoices();
+}
 
 applyFixedSideButtonWidth();
 setNoLevelMode(true);
@@ -2705,5 +3782,70 @@ updateStatsUI();
 updateLevelButtons();
 setNextEnabled(false);
 </script>
+
+<script>
+(function(){
+  function updateNoSpeak(){
+    const qc = document.getElementById("questionCenter");
+    const speak = document.getElementById("btnSpeak");
+    if(!qc) return;
+    
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    if(!isMobile){
+      qc.classList.remove("qc-noSpeak");
+      return;
+    }
+    
+    // Check current level - levels 1, 4, 5 should ALWAYS show audio button
+    const lvl = state && state.currentLevel ? state.currentLevel : 0;
+    const shouldShowAudio = (lvl === 1 || lvl === 4 || lvl === 5);
+    
+    if(shouldShowAudio){
+      qc.classList.remove("qc-noSpeak");
+      return;
+    }
+    
+    // For other levels, check if button is actually hidden
+    const cs = speak ? window.getComputedStyle(speak) : null;
+    const noSpeak = (!speak) ||
+      speak.classList.contains("hidden") ||
+      speak.hasAttribute("hidden") ||
+      (cs && (cs.display === "none" || cs.visibility === "hidden" || cs.opacity === "0")) ||
+      (speak && speak.getClientRects().length === 0);
+    qc.classList.toggle("qc-noSpeak", noSpeak);
+  }
+  
+
+
+function applyMobileLevel6Labels(){
+  const isMobile = window.matchMedia && window.matchMedia("(max-width: 640px)").matches;
+  const labels = document.querySelectorAll('#level6Area .grid > div > div.text-xs');
+  if(labels.length < 3) return;
+  if(isMobile){
+    labels[0].textContent = "Inf.";
+    labels[1].textContent = "Past";
+    labels[2].textContent = "PP";
+  }else{
+    labels[0].textContent = "Infinitive";
+    labels[1].textContent = "Simple past";
+    labels[2].textContent = "Past participle";
+  }
+}
+window.addEventListener("resize", applyMobileLevel6Labels);
+
+window.addEventListener("load", updateNoSpeak);
+  window.addEventListener("resize", updateNoSpeak);
+  const speak = document.getElementById("btnSpeak");
+  if(speak){
+    new MutationObserver(updateNoSpeak).observe(speak, {attributes:true, attributeFilter:["class","style"]});
+  }
+  // Also update when level changes
+  if(window.MutationObserver){
+    const bodyObs = new MutationObserver(updateNoSpeak);
+    bodyObs.observe(document.body, {attributes:true, attributeFilter:["class"]});
+  }
+})();
+</script>
+
 </body>
 </html>
